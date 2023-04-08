@@ -19,7 +19,6 @@ function createWindow() {
     icon,
     width: 650,
     height: 400,
-    frame: false,
     resizable: false,
     webPreferences: {
       nodeIntegration: true,
