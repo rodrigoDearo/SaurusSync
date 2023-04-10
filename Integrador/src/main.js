@@ -14,14 +14,20 @@ var ChaveCaixa = "8FC34496-0E8F-4877-9DF7-8D58B0B94788";
 var TpSync = 1;
 var DhReferencia = setDate();
 var Password = codificarInBase64(setSenha());
-var xBytesParametros = codificarInBase64(criarEziparArquivoXml());
+
 /*codificarInBase64(criarEziparArquivoXml())*/;
 // AREA TESTE
 
 
+var stringTeste = `<xmlIntegracao>
+  <Dominio>testescontrollerplus</Dominio>
+  <TpArquivo>50</TpArquivo>
+  <ChaveCaixa>8FC34496-0E8F-4877-9DF7-8D58B0B94788</ChaveCaixa>
+  <TpSync>1</TpSync>
+  <DhReferencia>2022-01-01T00:00:00-03:00</DhReferencia>
+</xmlIntegracao>`;
 
-
-
+var xBytesParametros = codificarInBase64(stringTeste);
 
 // ---------------------- FUNÇÃO DA REQUISIÇÃO ---------------------- //
 function reqStatus(){
@@ -67,8 +73,8 @@ function criarEziparArquivoXml(){
   .end({ pretty: true });
 
   let xmlString = xmlIntegracao.toString(); // TRANSFORMA XML EM STRING
-  let compressedXml = zlib.gzipSync(xmlString); // COMPACTA XML
-  return compressedXml;
+  //let compressedXml = zlib.gzipSync(xmlString);  COMPACTA XML
+  return xmlString;
 }
 
 
@@ -86,7 +92,7 @@ function setSenha(){
     let dataAtual = new Date();
 
     let dia = dataAtual.getDate();
-    let mes = dataAtual.getMonth() + 1;
+    let mes = dataAtual.getMonth();
     let ano = dataAtual.getFullYear();
 
     let senha = `ophd02ophd02|@${dia + mes + ano - 2000}|${Dominio}|1`;
@@ -107,7 +113,8 @@ function setDate(){
 
 
 // EXECUTAR FUNÇÕES 
-reqStatus();
+
+console.log(Password);
 
 
 
