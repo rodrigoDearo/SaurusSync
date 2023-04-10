@@ -8,16 +8,21 @@ const axios = require('axios');
 
 
 // ATRIBUIÇÃO DOS VALORES A SEREM COMPACTADOS
-var Dominio = 'testescontrollerplus';
+var Dominio = 'testesdrsistema';
 var TpArquivo = 50;
-var ChaveCaixa = "8FC34496-0E8F-4877-9DF7-8D58B0B94788";
+var ChaveCaixa = "0F38F081-6B77-4464-8C7E-FC686FB5B57B";
 var TpSync = 1;
 var DhReferencia = setDate();
 var Password = codificarInBase64(setSenha());
-var xBytesParametros = codificarInBase64(criarEziparArquivoXml());
-/*codificarInBase64(criarEziparArquivoXml())*/;
+var stringTeste = `<xmlIntegracao>
+  <Dominio>testesdrsistema</Dominio>
+  <TpArquivo>50</TpArquivo>
+  <ChaveCaixa>0F38F081-6B77-4464-8C7E-FC686FB5B57B</ChaveCaixa>
+  <TpSync>1</TpSync>
+  <DhReferencia>2022-01-01T00:00:00-03:00</DhReferencia>
+</xmlIntegracao>`;
+var xBytesParametros = codificarInBase64(stringTeste);
 // AREA TESTE
-
 
 
 
@@ -36,7 +41,7 @@ function reqStatus(){
     <soap:Body>
       <retCadastros xmlns="http://saurus.net.br/">
         <xBytesParametros>${xBytesParametros}</xBytesParametros>
-        <xSenha>${Password}}</xSenha>
+        <xSenha>${Password}</xSenha>
       </retCadastros>
     </soap:Body>
   </soap:Envelope>`
@@ -67,8 +72,8 @@ function criarEziparArquivoXml(){
   .end({ pretty: true });
 
   let xmlString = xmlIntegracao.toString(); // TRANSFORMA XML EM STRING
-  let compressedXml = zlib.gzipSync(xmlString); // COMPACTA XML
-  return compressedXml;
+  //let compressedXml = zlib.gzipSync(xmlString);  COMPACTA XML
+  return xmlString;
 }
 
 
@@ -86,10 +91,11 @@ function setSenha(){
     let dataAtual = new Date();
 
     let dia = dataAtual.getDate();
-    let mes = dataAtual.getMonth() + 1;
-    let ano = dataAtual.getFullYear();
+    let mes = dataAtual.getMonth();
+    let ano = dataAtual.getFullYear() + 1;
 
     let senha = `ophd02ophd02|@${dia + mes + ano - 2000}|${Dominio}|1`;
+    senha = senha.toString();
     return senha;
 }
 
@@ -107,8 +113,8 @@ function setDate(){
 
 
 // EXECUTAR FUNÇÕES 
-reqStatus();
 
+reqStatus();
 
 
 // ---------------------- ELECTRON JS ---------------------- //
