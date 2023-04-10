@@ -114,7 +114,7 @@ function setDate(){
 
 // EXECUTAR FUNÇÕES 
 
-
+reqStatus();
 
 
 // ---------------------- ELECTRON JS ---------------------- //
