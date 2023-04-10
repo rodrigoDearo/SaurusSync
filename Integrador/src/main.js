@@ -6,69 +6,59 @@ const axios = require('axios');
 
 // VAR GERAIS DO PROGRAMA
 
-var bytesXmlGzip;
 
 // ATRIBUIÇÃO DOS VALORES A SEREM COMPACTADOS
-var Dominio = "dev08";
-var TpArquivo = "50";
-var ChaveCaixa = "38e358ee-3553-4622-81f8-fd9c323f45b4";
-var TpSync = "1";
+var Dominio = 'testescontrollerplus';
+var TpArquivo = 50;
+var ChaveCaixa = "8FC34496-0E8F-4877-9DF7-8D58B0B94788";
+var TpSync = 1;
 var DhReferencia = setDate();
-
+var Password = codificarInBase64(setSenha());
+var xBytesParametros = codificarInBase64(criarEziparArquivoXml());
+/*codificarInBase64(criarEziparArquivoXml())*/;
 // AREA TESTE
 
 
-function testarIsso(){
-  if(typeof window === 'undefined'){
-    console.log('Ao lado do Servidor');
-  }
-  else{
-    console.log('Ao lado do Cliente');
-  }
-}
+
+
+
 
 // ---------------------- FUNÇÃO DA REQUISIÇÃO ---------------------- //
-
 function reqStatus(){
   const headers = {
     'Content-Type': 'text/xml; charset=utf-8',
     //Content-Length: length
-    'SOAPAction': 'http://saurus.net.br/retStatusServico' // "http://saurus.net.br/retCadastros"
+    'SOAPAction': 'http://saurus.net.br/retCadastros'
   }
-  
-  /*
-  ADD CONST BODY{
 
-    <retCadastros xmlns="http://saurus.net.br/">
-        <xBytesParametros>base64Binary</xBytesParametros>
-        <xSenha>string</xSenha>
-      </retCadastros>
-  }
-  */ 
   const body = `<?xml version="1.0" encoding="utf-8"?>
   <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Body>
-      <retStatusServico xmlns="http://saurus.net.br/" />
+      <retCadastros xmlns="http://saurus.net.br/">
+        <xBytesParametros>${xBytesParametros}</xBytesParametros>
+        <xSenha>${Password}}</xSenha>
+      </retCadastros>
     </soap:Body>
   </soap:Envelope>`
 
   axios.post('https://wscadastros.saurus.net.br/v001/serviceCadastros.asmx', body, { headers })
     .then(response => {
-      console.log(response.data)
+      console.log(response.data);
     })
     .catch(error => {
-      console.log(error)
+      console.log(error);
     })
+    .finally(() => {
+      console.log('Termieni aq kk');
+    })   
 }
 
-// ---------------------- FIM DA FUNÇÃO DA REQUISIÇÃO ---------------------- //
 
 
 
 // ---------------------- FUNÇÃO PARA CRIAR E ZIPAR DADOS  ---------------------- //
-
 function criarEziparArquivoXml(){
-  const xmlIntegracao = builder.create('xmlIntegracao') // CRIAR XML INTEGRAÇÃO
+  let xmlIntegracao = builder.create('xmlIntegracao') // CRIAR XML INTEGRAÇÃO
   .ele('Dominio', Dominio) 
   .ele('TpArquivo', TpArquivo)
   .ele('ChaveCaixa', ChaveCaixa)
@@ -76,18 +66,36 @@ function criarEziparArquivoXml(){
   .ele('DhReferencia', DhReferencia)
   .end({ pretty: true });
 
-  const xmlString = xmlIntegracao.toString(); // TRANSFORMA XML EM STRING
-  const compressedXml = zlib.gzipSync(xmlString); // COMPACTA XML
-  bytesXmlGzip = new Uint8Array(compressedXml); //TRANSFORMA ARQUIVO COMPACTADO EM BYTES
-  console.log(bytesXmlGzip);
+  let xmlString = xmlIntegracao.toString(); // TRANSFORMA XML EM STRING
+  let compressedXml = zlib.gzipSync(xmlString); // COMPACTA XML
+  return compressedXml;
 }
 
-// ---------------------- FIM DA FUNÇÃO PARA CRIAR E ZIPAR DADOS  ---------------------- //
+
+
+// ---------------------- FUNÇÃO PARA CODIFICAR EM BASE 64 ---------------------- //
+function codificarInBase64(valueString){
+  let bytesXmlGzip = Buffer.from(valueString).toString('base64');
+  return bytesXmlGzip;
+}
+
+
+
+// ---------------------- FUNÇÃO PARA DEFINIR SENHA ---------------------- //
+function setSenha(){
+    let dataAtual = new Date();
+
+    let dia = dataAtual.getDate();
+    let mes = dataAtual.getMonth() + 1;
+    let ano = dataAtual.getFullYear();
+
+    let senha = `ophd02ophd02|@${dia + mes + ano - 2000}|${Dominio}|1`;
+    return senha;
+}
 
 
 
 // ---------------------- FUNÇÃO PARA PUXAR HORÁRIO ---------------------- //
-
 function setDate(){
   let data = new Date();  // FUNÇÃO PADRÃO NDOE PARA PUXAR DATA;
   let dataISO8601 = data.toISOString(); // TRANSFORMA NO PADRÃO DE DATA ISO8601
@@ -96,16 +104,12 @@ function setDate(){
   return data;
 }
 
-// ---------------------- FIM DA FUNÇÃO PARA PUXAR HORÁRIO ---------------------- //
-
-
 
 
 // EXECUTAR FUNÇÕES 
-criarEziparArquivoXml();
 reqStatus();
-setDate();
-testarIsso();
+
+
 
 // ---------------------- ELECTRON JS ---------------------- //
 
