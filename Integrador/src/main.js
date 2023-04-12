@@ -25,7 +25,7 @@ var xBytesParametros = codificarInBase64(stringTeste);
 // AREA TESTE
 
 
-
+// ADICAO DE COMENT
 
 
 // ---------------------- FUNÇÃO DA REQUISIÇÃO ---------------------- //
