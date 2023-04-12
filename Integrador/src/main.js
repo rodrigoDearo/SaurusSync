@@ -29,6 +29,9 @@ var xBytesParametros = codificarInBase64(stringTeste);
 
 
 // ---------------------- FUNÇÃO DA REQUISIÇÃO ---------------------- //
+/**
+ * Função para realizar a requisição post utilizando biblitoeca AXIOS
+ */
 function reqStatus(){
   const headers = {
     'Content-Type': 'text/xml; charset=utf-8',
@@ -62,6 +65,10 @@ function reqStatus(){
 
 
 // ---------------------- FUNÇÃO PARA CRIAR E ZIPAR DADOS  ---------------------- //
+/**
+ * Função para criar um arquivo XML e retorná-lo compactado
+ * @returns {xmlString} - Arquivo XML compactado em GZIP
+ */
 function criarEziparArquivoXml(){
   let xmlIntegracao = builder.create('xmlIntegracao') // CRIAR XML INTEGRAÇÃO
   .ele('Dominio', Dominio) 
@@ -79,14 +86,35 @@ function criarEziparArquivoXml(){
 
 
 // ---------------------- FUNÇÃO PARA CODIFICAR EM BASE 64 ---------------------- //
+/**
+ * Função para codificar valor para base64
+ * @param {valueString} - Valor a ser codificada
+ * @returns {bytesXmlGzip} - String codificada em base64
+ */
 function codificarInBase64(valueString){
   let bytesXmlGzip = Buffer.from(valueString).toString('base64');
   return bytesXmlGzip;
 }
 
 
+// ---------------------- FUNÇÃO PARA DEOCDIGICAR BASE 64 E EXTRAIR ZIP ---------------------- //
+
+/**
+ * 
+ * @param {data} - String codifica em base64 
+ * @returns {text} - Retorna string decodifica em ascii
+ */
+function decodificarBase64(data){
+  let text = new Buffer.from(data, 'base64').toString('ascii');
+  return text;
+}
+
 
 // ---------------------- FUNÇÃO PARA DEFINIR SENHA ---------------------- //
+/**
+ * Função para gerar a Senha da requisição com base no padrão
+ * @returns {senha} - String da senha a ser utilizada na requisição POST reqStatus()
+ */
 function setSenha(){
     let dataAtual = new Date();
 
@@ -102,6 +130,11 @@ function setSenha(){
 
 
 // ---------------------- FUNÇÃO PARA PUXAR HORÁRIO ---------------------- //
+
+/**
+ * Função para gerar e retornar data no padrão  ISO 8601
+ * @returns {data} - String referenciando a data no formato  ISO 8601 e fuso horário de brasilia (-3:00)
+ */
 function setDate(){
   let data = new Date();  // FUNÇÃO PADRÃO NDOE PARA PUXAR DATA;
   let dataISO8601 = data.toISOString(); // TRANSFORMA NO PADRÃO DE DATA ISO8601

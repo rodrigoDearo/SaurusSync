@@ -1,13 +1,8 @@
-const { app, BrowserWindow, nativeImage, ipcMain, ipcRenderer } = require("electron");
-
-ipcRenderer.on('enviar-valor', (event, valor) => {
-  console.log('Valor do input:', valor);
-});
+const { app, BrowserWindow, nativeImage, ipcMain } = require("electron");
 
 
-require("electron-reload")(__dirname, {
-  electron: require(`${__dirname}/../node_modules/electron`),
-});
+
+
 
 
 
@@ -56,3 +51,8 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+require("electron-reload")(__dirname, {
+  electron: require(`${__dirname}/../node_modules/electron`),
+});
+
