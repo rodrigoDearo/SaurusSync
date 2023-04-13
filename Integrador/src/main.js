@@ -1,7 +1,7 @@
 // IMPORTANDO MÓDULOS E BIBLIOTECAS 
 const builder = require ('xmlbuilder'); 
 const zlib = require ('zlib');
-const { reqCadastros, setSenha } = require('./reqCadastros')
+const { reqCadastros, setSenha } = require('./structures/reqCadastros')
 
 
 
@@ -13,6 +13,7 @@ const { reqCadastros, setSenha } = require('./reqCadastros')
 
 
 // EXECUTAR FUNÇÕES 
+
 
 reqCadastros();
 

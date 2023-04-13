@@ -19,7 +19,6 @@ var xmlReqCadastro = `<xmlIntegracao>
 var xBytesParametros = codificarInBase64(xmlReqCadastro);
 
 
-
 // ---------------------- FUNÇÃO PARA DEFINIR SENHA ---------------------- //
 /**
  * Função para gerar a Senha da requisição com base no padrão
@@ -27,7 +26,7 @@ var xBytesParametros = codificarInBase64(xmlReqCadastro);
  */
 function setSenha(){
   let dataAtual = new Date();
-  
+
   let dia = dataAtual.getDate();
   let mes = dataAtual.getMonth();
   let ano = dataAtual.getFullYear() + 1;
@@ -36,6 +35,7 @@ function setSenha(){
   senha = senha.toString();
   return senha;
 }
+
 
 // ---------------------- FUNÇÃO PARA PUXAR HORÁRIO ---------------------- //
 
@@ -90,4 +90,10 @@ function reqCadastros(){
     .finally(() => {
       console.log('Requisição Finalizada');
     })   
+}
+
+
+function Ola(){
+  let alertar = document.getElementById('teste').value;
+  alert('Rodando Função ' + alertar);
 }
