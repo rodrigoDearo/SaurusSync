@@ -1,0 +1,31 @@
+body{
+    background-color: white;
+}
+
+.menu{
+    background-color: #08073F;
+}
+
+#navbar_menu{
+    background-color: rgb(37, 37, 37);
+}
+
+#button_menu{
+    background: white;
+    border: none;
+}
+
+#close{
+    background-color: white;
+}
+
+.button_menu{
+    border: 0.5 solid black;
+    margin-bottom: 5px;
+    border-radius:  5px;
+    background-color: transparent;
+}
+
+#offcanvasRightLabel{
+    color: white;
+}
