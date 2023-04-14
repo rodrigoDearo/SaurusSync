@@ -1,5 +1,6 @@
 /* ---------------------- IMPORTAÇÃO DE MÓDULOS ----------------------*/
 const { codificarInBase64 } = require('./tratamentoDados');
+const ipcRenderer = require('electron');
 const axios = require('axios');
 
 
@@ -93,7 +94,5 @@ function reqCadastros(){
 }
 
 
-function Ola(){
-  let alertar = document.getElementById('teste').value;
-  alert('Rodando Função ' + alertar);
-}
+
+

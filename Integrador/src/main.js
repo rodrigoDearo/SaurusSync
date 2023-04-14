@@ -2,7 +2,7 @@
 const builder = require ('xmlbuilder'); 
 const zlib = require ('zlib');
 const { reqCadastros, setSenha } = require('./structures/reqCadastros')
-
+const express = require('express');
 
 
 
@@ -15,7 +15,22 @@ const { reqCadastros, setSenha } = require('./structures/reqCadastros')
 // EXECUTAR FUNÇÕES 
 
 
-reqCadastros();
+
+// ---------------------- EXPRESS JS ---------------------- //
+
+
+
+const expss = express();
+
+expss.get('/reqCadastro', (req, res) => {
+    console.log('Função executada no servidor!');
+    reqCadastros()
+});
+
+expss.listen(3000, () => {
+    console.log('Servidor Express iniciado na porta 3000');
+});
+
 
 
 // ---------------------- ELECTRON JS ---------------------- //
@@ -69,6 +84,7 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
 
 
 
