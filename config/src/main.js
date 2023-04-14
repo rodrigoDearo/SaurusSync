@@ -1,8 +1,12 @@
 const { app, BrowserWindow, nativeImage, ipcMain } = require("electron");
 
-require("electron-reload")(__dirname, {
-  electron: require(`${__dirname}/../node_modules/electron`),
-});
+
+
+
+
+
+
+// ------------------------- ELECTRON JS ------------------------- //
 
 // Função que cria uma janela desktop
 function createWindow() {
@@ -19,6 +23,7 @@ function createWindow() {
     icon,
     width: 650,
     height: 400,
+    frame: false,
     resizable: false,
     webPreferences: {
       nodeIntegration: true,
@@ -46,3 +51,8 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+require("electron-reload")(__dirname, {
+  electron: require(`${__dirname}/../node_modules/electron`),
+});
+
