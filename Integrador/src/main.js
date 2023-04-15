@@ -2,6 +2,7 @@
 const builder = require ('xmlbuilder'); 
 const zlib = require ('zlib');
 const { reqCadastros, setSenha } = require('./structures/reqCadastros')
+
 const express = require('express');
 
 
@@ -24,7 +25,7 @@ const expss = express();
 
 expss.get('/reqCadastro', (req, res) => {
     console.log('Função executada no servidor!');
-    reqCadastros()
+    criandoXML();
 });
 
 expss.listen(3000, () => {

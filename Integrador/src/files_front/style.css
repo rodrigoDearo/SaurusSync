@@ -1,0 +1,60 @@
+
+body{
+    background-color: white;
+}
+
+.menu{
+    background-color: #08073F;
+}
+
+.titulo{
+    color: white;
+}
+
+#navbar_menu{
+    background-color: rgb(37, 37, 37);
+}
+
+#button_menu{
+    background: white;
+    border: none;
+}
+
+#close{
+    background-color: white;
+}
+
+.button_menu{
+    border: 0.5 solid black;
+    margin-bottom: 5px;
+    border-radius:  5px;
+    background-color: transparent;
+}
+
+#offcanvasRightLabel{
+    color: white;
+}
+
+/* STYLE PARA TODOS FORMS */
+
+#formularioFull{
+    margin-top: 35px;
+}
+
+.input-text{
+    border: 0.8px solid black;
+}
+
+
+.form-label{
+    font-size: 1.25em;
+}
+
+#last-input-saurus{
+    padding-bottom: 25px;
+}
+
+.botao-save{
+    background-color: #58AD61;
+    border: none;
+}
