@@ -58,3 +58,8 @@ body{
     background-color: #58AD61;
     border: none;
 }
+
+#botaoCloseApp{
+    background-color: white;
+    padding: 10px;
+}

@@ -1,7 +1,7 @@
 /* ---------------------- IMPORTAÇÃO DE MÓDULOS ----------------------*/
 const { codificarInBase64 } = require('./tratamentoDados');
-const ipcRenderer = require('electron');
 const axios = require('axios');
+const fs = require('fs');
 
 
 /* ---------------------- DEFINIÇÃOD E VARIÁVEIS ---------------------- */
@@ -52,12 +52,6 @@ function setDate(){
   return data;
 }
 
- module.exports = { 
-  setDate, 
-  setSenha,
-  reqCadastros
-};
-
 var Password = codificarInBase64(setSenha());
 
 // ---------------------- FUNÇÃO DA REQUISIÇÃO ---------------------- //
@@ -93,6 +87,10 @@ function reqCadastros(){
     })   
 }
 
-
+module.exports = { 
+  setDate, 
+  setSenha,
+  reqCadastros
+};
 
 

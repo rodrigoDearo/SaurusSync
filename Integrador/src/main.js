@@ -1,7 +1,5 @@
 // IMPORTANDO MÓDULOS E BIBLIOTECAS 
-const builder = require ('xmlbuilder'); 
-const zlib = require ('zlib');
-const { reqCadastros, setSenha } = require('./structures/reqCadastros')
+
 
 const express = require('express');
 
@@ -20,12 +18,16 @@ const express = require('express');
 // ---------------------- EXPRESS JS ---------------------- //
 
 
-
 const expss = express();
 
 expss.get('/reqCadastro', (req, res) => {
     console.log('Função executada no servidor!');
     criandoXML();
+});
+
+expss.get('/closeApp', (req, res) => {
+  console.log('Função de fechamento do APP executada !');
+  app.quit();
 });
 
 expss.listen(3000, () => {
