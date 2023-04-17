@@ -23,10 +23,7 @@ function closeApp() {
 
 
 function saveSaurus(chave, dominio){
-    let chaveLet = chave;
-    let dominioLet = dominio;
-    console.log('Testee, chamando funcao');
-    fetch(`http://localhost:3000/saveSaurus/${chaveLet}/${dominioLet}`)
+    fetch(`http://localhost:3000/saveSaurus/${chave}/${dominio}`)
     .then(response => response.text())
     .then(data =>{
         console.log('fetch concluido');

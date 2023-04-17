@@ -1,6 +1,6 @@
 // IMPORTANDO MÓDULOS E BIBLIOTECAS 
 const express = require('express');
-const { salvarDadosSaurus } = require('./structures/manipulacaoXML');
+const { salvarDados } = require('./structures/manipulacaoJSON');
 
 
 
@@ -29,7 +29,7 @@ expss.get('/closeApp', (req, res) => {
 });
 
 expss.get(`/saveSaurus/:chave/:dominio`, (req, res) => {
-    salvarDadosSaurus(req.params.chave, req.params.dominio);
+  salvarDados(req.params.chave, req.params.dominio, 'saurus');
 })
 
 expss.listen(3000, () => {

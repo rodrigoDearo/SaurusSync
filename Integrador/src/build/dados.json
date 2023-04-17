@@ -1,0 +1,13 @@
+{
+  "dadosApp": {
+    "saurus": {
+      "chave": "313-1-31-4-5-15-1-51-5-15-1-51",
+      "dominio": "testes"
+    },
+    "tray": {},
+    "configGeral": {
+      "timer": {},
+      "caminho": {}
+    }
+  }
+}
