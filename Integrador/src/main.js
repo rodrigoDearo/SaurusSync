@@ -1,7 +1,6 @@
 // IMPORTANDO MÓDULOS E BIBLIOTECAS 
-
-
 const express = require('express');
+const { salvarDadosSaurus } = require('./structures/manipulacaoXML');
 
 
 
@@ -22,13 +21,16 @@ const expss = express();
 
 expss.get('/reqCadastro', (req, res) => {
     console.log('Função executada no servidor!');
-    criandoXML();
 });
 
 expss.get('/closeApp', (req, res) => {
-  console.log('Função de fechamento do APP executada !');
-  app.quit();
+    console.log('Função de fechamento do APP executada !');
+    app.quit();
 });
+
+expss.get(`/saveSaurus/:chave/:dominio`, (req, res) => {
+    salvarDadosSaurus(req.params.chave, req.params.dominio);
+})
 
 expss.listen(3000, () => {
     console.log('Servidor Express iniciado na porta 3000');
