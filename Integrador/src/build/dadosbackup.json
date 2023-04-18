@@ -1,0 +1,13 @@
+{
+  "dadosApp": {
+    "saurus": {
+      "chave": "",
+      "dominio": ""
+    },
+    "tray": {},
+    "configGeral": {
+      "timer": "",
+      "caminho": ""
+    }
+  }
+}

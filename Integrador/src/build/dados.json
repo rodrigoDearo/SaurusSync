@@ -1,13 +1,13 @@
 {
   "dadosApp": {
     "saurus": {
-      "chave": "313-1-31-4-5-15-1-51-5-15-1-51",
-      "dominio": "testes"
+      "chave": "CACACA-CAC-A-CA-CA-",
+      "dominio": "TESTES"
     },
-    "tray": {},
-    "configGeral": {
-      "timer": {},
-      "caminho": {}
-    }
+    "geral": {
+      "timer": "141",
+      "caminho": "adadada"
+    },
+    "tray": {}
   }
 }

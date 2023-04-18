@@ -30,7 +30,11 @@ expss.get('/closeApp', (req, res) => {
 
 expss.get(`/saveSaurus/:chave/:dominio`, (req, res) => {
   salvarDados(req.params.chave, req.params.dominio, 'saurus');
-})
+});
+
+expss.get(`/saveGeral/:caminho/:timer`, (req, res) =>{
+  salvarDados(req.params.caminho, req.params.timer, 'geral');
+});
 
 expss.listen(3000, () => {
     console.log('Servidor Express iniciado na porta 3000');

@@ -19,15 +19,13 @@ function salvarDados(campo1, campo2, systemSave){
         break;
     
       case 'geral':
-        dadosApp.dadosApp.saurus.timer = campo1;
-        dadosApp.dadosApp.saurus.caminho = campo2;
+        dadosApp.dadosApp.geral.caminho = campo1;
+        dadosApp.dadosApp.geral.timer = campo2;
         break;
 
       case tray:
         break;
     }
-  
-
   
       let novoJson = JSON.stringify(dadosApp, null, 2);
 
