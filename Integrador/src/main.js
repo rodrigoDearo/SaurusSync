@@ -30,12 +30,18 @@ expss.get(`/saveSaurus/:chave/:dominio`, (req, res) => {
   salvarDados(req.params.chave, req.params.dominio, 'saurus');
 });
 
-expss.get(`/saveGeral/:caminho/:timer`, (req, res) =>{
-  salvarDados(req.params.caminho, req.params.timer, 'geral');
+expss.get(`/saveGeral/:timer`, (req, res) =>{
+  salvarDados(req.params.timer, null, 'geral');
 });
 
 expss.get(`/carregarInfo`, (req, res) =>{
-  res.json(retornarDados());
+  retornarDados()
+  .then((dadosRetorno) => {
+    res.json(dadosRetorno);
+  })
+  .catch((err) => {
+    console.error('Erro ao retornar dados:', err);
+  });
 })
 
 expss.listen(3000, () => {

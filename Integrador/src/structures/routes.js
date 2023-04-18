@@ -40,9 +40,7 @@ function saveSaurus(){
 
 function saveGeral(){
     let timer = document.getElementById('timer-input').value;
-    let caminho = document.getElementById('caminho-input').value;
-
-    fetch(`http://localhost:3000/saveGeral/${caminho}/${timer}`)
+    fetch(`http://localhost:3000/saveGeral/${timer}`)
     .then(response => response.text())
     .then(data =>{
         console.log('Fetch concluido');
@@ -53,18 +51,26 @@ function saveGeral(){
     })
 }
 
-function carregarInfo(){
-    console.log('Inicio carregar Info');
+function carregarInfoSaurus(){
     fetch('http://localhost:3000/carregarInfo')
     .then(response => response.json())
     .then(dados =>{
-        console.log(dados[0]);
-        /*document.getElementById('chaveCaixa-input').value = dados[0];
+        document.getElementById('chaveCaixa-input').value = dados[0];
         document.getElementById('dominio-input').value = dados[1];
-        document.getElementById('caminho-input').value = dados[2];
-        document.getElementById('timer-input').value = dados[3];*/
     });
-    console.log('Fim carregar info')
 }
 
-window.onload = carregarInfo;
+function carregarInfoGeral(){
+    fetch('http://localhost:3000/carregarInfo')
+    .then(response => response.json())
+    .then(dados =>{
+        document.getElementById('timer-input').value = dados[2];
+    });
+}
+
+window.onload = function(){
+    carregarInfoSaurus();
+    carregarInfoGeral();
+};
+/*document.getElementById('caminho-input').value = dados[0];
+        document.getElementById('timer-input').value = dados[1];*/

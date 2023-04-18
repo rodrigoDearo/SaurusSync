@@ -18,11 +18,10 @@ function salvarDados(campo1, campo2, systemSave){
         break;
     
       case 'geral':
-        dadosApp.dadosApp.geral.caminho = campo1;
-        dadosApp.dadosApp.geral.timer = campo2;
+        dadosApp.dadosApp.geral.timer = campo1;
         break;
 
-      case tray:
+      case 'tray':
         break;
     }
   
@@ -42,19 +41,22 @@ function salvarDados(campo1, campo2, systemSave){
 }
 
 
-function retornarDados(){
-  console.log('inicioRetornaDados');
-  fs.readFile('./src/build/dados.json', 'utf-8', (err, data) =>{
-      
-      let dados = JSON.parse(data);
-      let dadosRetorno = [
-        dados.dadosApp.saurus.chave,
-        dados.dadosApp.saurus.dominio,
-        dados.dadosApp.geral.caminho,
-        dados.dadosApp.geral.timer
-      ];
-      return dadosRetorno
-  })
+function retornarDados() {
+  return new Promise((resolve, reject) => {
+    fs.readFile('./src/build/dados.json', 'utf-8', (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        let dados = JSON.parse(data);
+        var dadosRetorno = [
+          dados.dadosApp.saurus.chave,
+          dados.dadosApp.saurus.dominio,
+          dados.dadosApp.geral.timer
+        ];
+        resolve(dadosRetorno);
+      }
+    });
+  });
 }
   
 

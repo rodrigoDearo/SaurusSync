@@ -1,12 +1,12 @@
 {
   "dadosApp": {
     "saurus": {
-      "chave": "ADADA",
-      "dominio": "DAD"
+      "chave": "ABCDEF-GHIJKL-MNOPQR-STUVWX-YZ1234-5678",
+      "dominio": "testesdrsistema"
     },
     "geral": {
-      "timer": "14",
-      "caminho": "afa"
+      "timer": "600",
+      "caminho": "ca:"
     },
     "tray": {}
   }
