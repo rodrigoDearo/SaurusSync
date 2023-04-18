@@ -1,6 +1,11 @@
 const fs = require('fs');
 
-
+/**
+ * Função para salvar em um banco de dados não relacional as informações para agilizar próximas cargas
+ * @param {*} campo1 Caso não nulo, é uma informação para ser cadastrada
+ * @param {*} campo2 Caso não nuulo, é outra informalção para ser cadastrada
+ * @param {string} systemSave Informa qual tabela do arquivo JSOn pertence a informação
+ */
 function salvarDados(campo1, campo2, systemSave){
   fs.readFile('./src/build/dados.json', 'utf-8', (err, data) => {
     if (err) {
@@ -40,7 +45,10 @@ function salvarDados(campo1, campo2, systemSave){
   });
 }
 
-
+/**
+ * Função que retorna array com informações puxadas o arquivo dados.JSON
+ * @returns {dadosRetorno} uma array contendo as informação a serem alocadas nos campos "value" dos input HTML 
+ */
 function retornarDados() {
   return new Promise((resolve, reject) => {
     fs.readFile('./src/build/dados.json', 'utf-8', (err, data) => {
@@ -58,7 +66,6 @@ function retornarDados() {
     });
   });
 }
-  
 
 module.exports = { 
     salvarDados,

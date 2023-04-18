@@ -10,6 +10,9 @@ function chamarFuncaoNoServidor() {
 }
 
 
+/**
+ * Função que faz requisição para porta 3000 para fechamento ao app Electron.js
+ */
 function closeApp() {
     fetch('http://localhost:3000/closeApp')
         .then(response => response.text())
@@ -22,6 +25,9 @@ function closeApp() {
 }
 
 
+/**
+ * Função de requisição para porta 3000 para gravar dados do cadastro de informações do Saurus
+ */
 function saveSaurus(){
     let chave = document.getElementById('chaveCaixa-input').value;
     let dominio = document.getElementById('dominio-input').value;
@@ -38,6 +44,9 @@ function saveSaurus(){
 }
 
 
+/**
+ * Função de requisição para porta 3000 para gravar dados do cadastro de informações Gerais do app
+ */
 function saveGeral(){
     let timer = document.getElementById('timer-input').value;
     fetch(`http://localhost:3000/saveGeral/${timer}`)
@@ -51,6 +60,10 @@ function saveGeral(){
     })
 }
 
+
+/**
+ * Função de requisição para porta 3000 para carregar valores dos campos "value" dos inputs HTML Saurus
+ */
 function carregarInfoSaurus(){
     fetch('http://localhost:3000/carregarInfo')
     .then(response => response.json())
@@ -60,6 +73,10 @@ function carregarInfoSaurus(){
     });
 }
 
+
+/**
+ * Função de requisição para porta 3000 para carregar valores dos campos "value" dos inputs HTML geral
+ */
 function carregarInfoGeral(){
     fetch('http://localhost:3000/carregarInfo')
     .then(response => response.json())
@@ -68,6 +85,16 @@ function carregarInfoGeral(){
     });
 }
 
+
+
+function clique(){
+    alert('Hello World');
+    alert(document.getElementById('datetime-input').value);
+}
+
+/**
+ * Função para rodar funções no carregamento das paginas
+ */
 window.onload = function(){
     carregarInfoSaurus();
     carregarInfoGeral();
