@@ -1,5 +1,3 @@
-const { response } = require("express");
-
 function chamarFuncaoNoServidor() {
     fetch('http://localhost:3000/reqCadastro')
         .then(response => response.text())
@@ -24,7 +22,10 @@ function closeApp() {
 }
 
 
-function saveSaurus(chave, dominio){
+function saveSaurus(){
+    let chave = document.getElementById('chaveCaixa-input').value;
+    let dominio = document.getElementById('dominio-input').value;
+
     fetch(`http://localhost:3000/saveSaurus/${chave}/${dominio}`)
     .then(response => response.text())
     .then(data =>{
@@ -37,7 +38,10 @@ function saveSaurus(chave, dominio){
 }
 
 
-function saveGeral(caminho, timer){
+function saveGeral(){
+    let timer = document.getElementById('timer-input').value;
+    let caminho = document.getElementById('caminho-input').value;
+
     fetch(`http://localhost:3000/saveGeral/${caminho}/${timer}`)
     .then(response => response.text())
     .then(data =>{
@@ -48,3 +52,19 @@ function saveGeral(caminho, timer){
         confirm.log(error);
     })
 }
+
+function carregarInfo(){
+    console.log('Inicio carregar Info');
+    fetch('http://localhost:3000/carregarInfo')
+    .then(response => response.json())
+    .then(dados =>{
+        console.log(dados[0]);
+        /*document.getElementById('chaveCaixa-input').value = dados[0];
+        document.getElementById('dominio-input').value = dados[1];
+        document.getElementById('caminho-input').value = dados[2];
+        document.getElementById('timer-input').value = dados[3];*/
+    });
+    console.log('Fim carregar info')
+}
+
+window.onload = carregarInfo;

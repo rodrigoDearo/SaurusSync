@@ -1,5 +1,4 @@
 const fs = require('fs');
-const xml2js = require('xml2js');
 
 
 function salvarDados(campo1, campo2, systemSave){
@@ -43,8 +42,23 @@ function salvarDados(campo1, campo2, systemSave){
 }
 
 
+function retornarDados(){
+  console.log('inicioRetornaDados');
+  fs.readFile('./src/build/dados.json', 'utf-8', (err, data) =>{
+      
+      let dados = JSON.parse(data);
+      let dadosRetorno = [
+        dados.dadosApp.saurus.chave,
+        dados.dadosApp.saurus.dominio,
+        dados.dadosApp.geral.caminho,
+        dados.dadosApp.geral.timer
+      ];
+      return dadosRetorno
+  })
+}
   
 
 module.exports = { 
-    salvarDados
+    salvarDados,
+    retornarDados
 }

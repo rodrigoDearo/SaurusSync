@@ -1,8 +1,6 @@
 // IMPORTANDO MÓDULOS E BIBLIOTECAS 
 const express = require('express');
-const { salvarDados } = require('./structures/manipulacaoJSON');
-
-
+const { salvarDados, retornarDados } = require('./structures/manipulacaoJSON');
 
 // AREA TESTE
 
@@ -35,6 +33,10 @@ expss.get(`/saveSaurus/:chave/:dominio`, (req, res) => {
 expss.get(`/saveGeral/:caminho/:timer`, (req, res) =>{
   salvarDados(req.params.caminho, req.params.timer, 'geral');
 });
+
+expss.get(`/carregarInfo`, (req, res) =>{
+  res.json(retornarDados());
+})
 
 expss.listen(3000, () => {
     console.log('Servidor Express iniciado na porta 3000');
