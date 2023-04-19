@@ -1,6 +1,7 @@
 // IMPORTANDO MÓDULOS E BIBLIOTECAS 
 const express = require('express');
 const { salvarDados, retornarDados } = require('./structures/manipulacaoJSON');
+const { reqCadastros } = require('./structures/reqCadastros');
 
 // AREA TESTE
 
@@ -18,6 +19,7 @@ const { salvarDados, retornarDados } = require('./structures/manipulacaoJSON');
 const expss = express();
 
 expss.get('/reqCadastro', (req, res) => {
+    reqCadastros();
     console.log('Função executada no servidor!');
 });
 

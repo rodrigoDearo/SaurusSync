@@ -67,7 +67,34 @@ function retornarDados() {
   });
 }
 
+
+function retornaCampo(campo){
+  return new Promise((resolve, reject) => {
+    fs.readFile('./src/build/dados.json', 'utf-8', (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        let dados = JSON.parse(data);
+        switch (campo) {
+          case 'chave':
+            var dadosRetorno = dados.dadosApp.saurus.chave;
+            break;
+          
+          case 'dominio':
+            var dadosRetorno = dados.dadosApp.saurus.dominio;
+            break;
+          
+        }
+        return(dadosRetorno);
+      }
+    });
+  });
+}
+
+
+
 module.exports = { 
     salvarDados,
-    retornarDados
+    retornarDados,
+    retornaCampo
 }
