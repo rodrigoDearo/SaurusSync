@@ -101,7 +101,7 @@ function reqCadastros() {
 }
 
 
-module.exports = { 
+module.exports = {
   setDate, 
   setSenha,
   reqCadastros
