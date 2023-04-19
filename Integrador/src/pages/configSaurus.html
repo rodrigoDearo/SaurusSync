@@ -41,20 +41,21 @@
 
     <form class="container-fluid col-8" id="formularioFull">
         <div class="mb-3">
-          <label class="form-label">Domínio</label>
-          <input type="text" class="form-control input-text" aria-describedby="emailHelp">
-        </div>
-        <div class="mb-3" id="last-input-saurus">
           <label class="form-label">Chave Caixa</label>
-          <input type="text" class="form-control input-text">
+          <input type="text" id="chaveCaixa-input" class="form-control input-text" required>
+          
         </div>
-        <button type="submit" onclick="" class="btn btn-primary container botao-save">Salvar</button>
+        <div class="mb-3" id="last-input">
+            <label class="form-label">Domínio</label>
+            <input type="text" id="dominio-input" class="form-control input-text" required>
+        </div>
+        <button type="submit" onclick="saveSaurus()" class="btn btn-primary container botao-save">Salvar</button>
       </form>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="../main.js" type="module"></script>
-    <script src="../structures/renderer.js"></script>
+    <script src="../structures/routes.js"></script>
     <script src="../files_front/script.js"></script>
 </body>
 </html>

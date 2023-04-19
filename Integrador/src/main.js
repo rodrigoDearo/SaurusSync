@@ -1,9 +1,7 @@
 // IMPORTANDO MÓDULOS E BIBLIOTECAS 
-
-
 const express = require('express');
-
-
+const { salvarDados, retornarDados } = require('./structures/manipulacaoJSON');
+const { reqCadastros } = require('./structures/reqCadastros');
 
 // AREA TESTE
 
@@ -21,14 +19,32 @@ const express = require('express');
 const expss = express();
 
 expss.get('/reqCadastro', (req, res) => {
+    reqCadastros('1');
     console.log('Função executada no servidor!');
-    criandoXML();
 });
 
 expss.get('/closeApp', (req, res) => {
-  console.log('Função de fechamento do APP executada !');
-  app.quit();
+    console.log('Função de fechamento do APP executada !');
+    app.quit();
 });
+
+expss.get(`/saveSaurus/:chave/:dominio`, (req, res) => {
+  salvarDados(req.params.chave, req.params.dominio, 'saurus');
+});
+
+expss.get(`/saveGeral/:timer`, (req, res) =>{
+  salvarDados(req.params.timer, null, 'geral');
+});
+
+expss.get(`/carregarInfo`, (req, res) =>{
+  retornarDados()
+  .then((dadosRetorno) => {
+    res.json(dadosRetorno);
+  })
+  .catch((err) => {
+    console.error('Erro ao retornar dados:', err);
+  });
+})
 
 expss.listen(3000, () => {
     console.log('Servidor Express iniciado na porta 3000');

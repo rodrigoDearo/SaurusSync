@@ -1,0 +1,13 @@
+{
+  "dadosApp": {
+    "saurus": {
+      "chave": "0F38F081-6B77-4464-8C7E-FC686FB5B57B",
+      "dominio": "testesdrsistema"
+    },
+    "geral": {
+      "timer": "06:30",
+      "caminho": "ca:"
+    },
+    "tray": {}
+  }
+}
