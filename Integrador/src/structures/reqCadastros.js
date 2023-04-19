@@ -4,8 +4,7 @@ const { retornaCampo } = require('./manipulacaoJSON');
 const axios = require('axios');
 const fs = require('fs');
 
-var TpSync = '1';
-var Dominio, ChaveCaixa, xBytesParametros; // Declarar as variáveis
+var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync; // Declarar as variáveis
 
 // ...resto do código...
 function setDate(){
@@ -63,10 +62,24 @@ async function codificarXmlReqCadastro() {
   }
 }
 
+// Função assíncrona para codificar a senha
+async function codificarSenha(){
+  try{
+    Password = codificarInBase64(setSenha());
+  }
+  catch (err){
+    console.err('Erro ao codificar Senha:', err);
+  }
+}
+
 // Função para realizar a requisição post dos cadastros
-function reqCadastros() {
+function reqCadastros(Sync) {
   getChaveCaixa()
+    .then(() => {
+      TpSync = Sync
+    })
     .then(() => getDominio())
+    .then(() => codificarSenha())
     .then(() => codificarXmlReqCadastro())
     .then(() => {
       const headers = {
@@ -87,7 +100,7 @@ function reqCadastros() {
       console.log('Dominio: ' + Dominio);
       console.log('Chave Caixa: ' + ChaveCaixa);
       console.log(xBytesParametros);
-      axios.post('https://wscadastros.saurus.net.br/v001/serviceCadastros', body, { headers })
+      axios.post('https://wscadastros.saurus.net.br/v001/serviceCadastros.asmx', body, { headers })
         .then((response) => {
           console.log('Resposta:', response.data);
         })

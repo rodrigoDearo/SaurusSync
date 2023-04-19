@@ -85,7 +85,7 @@ function retornaCampo(campo){
             break;
           
         }
-        return(dadosRetorno);
+        resolve(dadosRetorno);
       }
     });
   });

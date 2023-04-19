@@ -19,7 +19,7 @@ const { reqCadastros } = require('./structures/reqCadastros');
 const expss = express();
 
 expss.get('/reqCadastro', (req, res) => {
-    reqCadastros();
+    reqCadastros('1');
     console.log('Função executada no servidor!');
 });
 
