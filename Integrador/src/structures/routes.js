@@ -1,6 +1,25 @@
+/**
+ * 
+ */
 function sincronizacaoUnica() {
     let data = document.getElementById('datetime-input').value;
     fetch(`http://localhost:3000/sincronizacaoUnica/${data}`)
+        .then(response => response.text())
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+
+/**
+ * 
+ */
+function sincronizacaoContinua(){
+    let data = document.getElementById('datetime-input').value;
+    fetch(`http://localhost:3000/sincronizacaoContinua/${data}`)
         .then(response => response.text())
         .then(data => {
             console.log(data);
@@ -86,17 +105,17 @@ function carregarInfoGeral(){
     });
 }
 
-
+/**
+ * Função de requisição para porta 3000 para carregar valor do campo data como horario atual
+ */
 function carregarData(){
     let data = new Date();
     data.setHours(data.getHours() - 3);
     document.getElementById('datetime-input').value = data.toISOString().slice(0, 16);;
 }
 
-function clique(){
-    alert('Hello World');
-    alert(document.getElementById('datetime-input').value);
-}
+
+
 
 /**
  * Função para rodar funções no carregamento das paginas

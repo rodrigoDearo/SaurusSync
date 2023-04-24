@@ -1,7 +1,7 @@
 // IMPORTANDO MÓDULOS E BIBLIOTECAS 
 const express = require('express');
 const { salvarDados, retornarDados } = require('./structures/manipulacaoJSON');
-const { sincronizacaoUnica } = require('./structures/reqCadastros');
+const { sincronizacaoUnica, sincronizacaoContinua } = require('./structures/reqCadastros');
 
 // AREA TESTE
 
@@ -20,8 +20,13 @@ const expss = express();
 
 expss.get('/sincronizacaoUnica/:data', (req, res) => {
     sincronizacaoUnica(req.params.data);
-    console.log('Função executada no servidor!');
+    console.log('Sincronização Única Realizada');
 });
+
+expss.get('/sincronizacaoContinua/:data', (req, res) =>{
+    sincronizacaoContinua(req.params.data);
+    console.log('Sincronização Contínua Executada');
+})
 
 expss.get('/closeApp', (req, res) => {
     console.log('Função de fechamento do APP executada !');

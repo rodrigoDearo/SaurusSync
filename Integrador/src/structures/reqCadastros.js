@@ -125,12 +125,18 @@ function reqCadastros(Sync) {
 
 
 function sincronizacaoUnica(data){
-    console.log(getData(data));
+    getData(data);
     reqCadastros('1');
+}
+
+function sincronizacaoContinua(data){
+  getData(data);
+  reqCadastros('2');
 }
 
 module.exports = {
   setDate, 
   setSenha,
-  sincronizacaoUnica
+  sincronizacaoUnica,
+  sincronizacaoContinua
 };
