@@ -1,0 +1,23 @@
+<cadastros tpArq="50" nroCadastro="304191004" nroProduto="304201012" dReferencia="2023-04-24T09:05:16.487">
+  <tbProdutoDados>
+    <row pro_idProduto="7025" pro_idImposto="1" pro_idPagamento="1" pro_idNcm="2009" pro_origem="0" pro_descProduto="CAFÉ EXPRESS" pro_idCategoria="1" pro_descCategoria="DIVERSOS" pro_idSubcategoria="1" pro_descSubCategoria="Sem Subcategoria" pro_descMarca="Sem Marca" pro_descMedida="UN" pro_descLocal="" pro_urlImpressora="" pro_vMinimo="0.0000000000" pro_vCompra="1.5000000000" pro_tpBalanca="1" pro_dVal="0" pro_infAdic="" pro_cProdANP="" pro_descANP="" pro_pGLP="0.0000" pro_pGNn="0.0000" pro_pGNi="0.0000" pro_CODIF="" pro_indStatus="1" />
+    <row pro_idProduto="8036" pro_idImposto="1" pro_idPagamento="1" pro_idNcm="1010" pro_origem="0" pro_descProduto="teste" pro_idCategoria="1" pro_descCategoria="DIVERSOS" pro_idSubcategoria="1" pro_descSubCategoria="Sem Subcategoria" pro_descMarca="Sem Marca" pro_descMedida="CX" pro_descLocal="" pro_urlImpressora="" pro_vMinimo="0.0000000000" pro_vCompra="0.0000000000" pro_tpBalanca="0" pro_dVal="0" pro_pGLP="0.0000" pro_pGNn="0.0000" pro_pGNi="0.0000" pro_indStatus="1" />
+    <row pro_idProduto="8039" pro_idImposto="2" pro_idPagamento="1" pro_idNcm="1" pro_origem="0" pro_descProduto="PRODUTO TESTE INTEGRACAO" pro_idCategoria="1" pro_descCategoria="DIVERSOS" pro_idSubcategoria="1" pro_descSubCategoria="Sem Subcategoria" pro_descMarca="Sem Marca" pro_descMedida="CX" pro_descLocal="" pro_urlImpressora="" pro_vMinimo="0.0000000000" pro_vCompra="2.0000000000" pro_tpBalanca="0" pro_dVal="0" pro_pGLP="0.0000" pro_pGNn="0.0000" pro_pGNi="0.0000" pro_indStatus="0" />
+    <row pro_idProduto="8040" pro_idImposto="1" pro_idPagamento="1" pro_idNcm="1" pro_origem="0" pro_descProduto="PRODUTO TESTE 2" pro_idCategoria="1" pro_descCategoria="DIVERSOS" pro_idSubcategoria="1" pro_descSubCategoria="Sem Subcategoria" pro_descMarca="Sem Marca" pro_descMedida="CX" pro_descLocal="" pro_urlImpressora="" pro_vMinimo="0.0000000000" pro_vCompra="3.0000000000" pro_tpBalanca="0" pro_dVal="0" pro_pGLP="0.0000" pro_pGNn="0.0000" pro_pGNi="0.0000" pro_indStatus="0" />
+  </tbProdutoDados>
+  <tbProdutoCodigos>
+    <row pro_idCodigo="8050" pro_idProduto="8039" pro_codProduto="8039" />
+    <row pro_idCodigo="8051" pro_idProduto="8039" pro_codProduto="7028" />
+    <row pro_idCodigo="8052" pro_idProduto="8040" pro_codProduto="8040" />
+    <row pro_idCodigo="8053" pro_idProduto="8040" pro_codProduto="7029" />
+  </tbProdutoCodigos>
+  <tbProdutoPrecos>
+    <row pro_idPreco="8298" pro_idTabPreco="2" pro_idProduto="8039" pro_vPreco="10.0000000000" />
+    <row pro_idPreco="8299" pro_idTabPreco="3" pro_idProduto="8039" pro_vPreco="2.0000000000" />
+    <row pro_idPreco="8297" pro_idTabPreco="1" pro_idProduto="8039" pro_vPreco="10.0000000000" />
+    <row pro_idPreco="8304" pro_idTabPreco="2" pro_idProduto="8040" pro_vPreco="10.0000000000" />
+    <row pro_idPreco="8305" pro_idTabPreco="3" pro_idProduto="8040" pro_vPreco="3.0000000000" />
+    <row pro_idPreco="8303" pro_idTabPreco="1" pro_idProduto="8040" pro_vPreco="10.0000000000" />
+    <row pro_idPreco="7231" pro_idTabPreco="1" pro_idProduto="7025" pro_vPreco="3.0000000000" />
+  </tbProdutoPrecos>
+</cadastros>

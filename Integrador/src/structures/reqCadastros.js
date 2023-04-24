@@ -1,5 +1,5 @@
 /* ---------------------- IMPORTAÇÃO DE MÓDULOS ----------------------*/
-const { codificarInBase64, decodificarBase64 } = require('./tratamentoDados');
+const { codificarInBase64, decodificarEsalvar } = require('./tratamentoDados');
 const { retornaCampo } = require('./manipulacaoJSON');
 const axios = require('axios');
 const xml2js = require('xml2js');
@@ -105,7 +105,7 @@ function reqCadastros(Sync) {
               console.error(err);
             } else {
               let retCadastrosResult = result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult[0];
-              console.log(decodificarBase64(retCadastrosResult));
+              decodificarEsalvar(retCadastrosResult);
             }
           });
         })
@@ -124,10 +124,3 @@ module.exports = {
   setSenha,
   reqCadastros
 };
-
-
-/*
-CÓDIGO ANTIGO
-
-
-*/  
