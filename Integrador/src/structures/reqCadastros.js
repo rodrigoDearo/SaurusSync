@@ -4,7 +4,7 @@ const { retornaCampo } = require('./manipulacaoJSON');
 const axios = require('axios');
 const xml2js = require('xml2js');
 
-var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync; // Declarar as variáveis
+var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync, DateTime; // Declarar as variáveis
 
 // ...resto do código...
 function setDate(){
@@ -30,17 +30,22 @@ function setSenha(){
 // Função assíncrona para retornar a ChaveCaixa
 async function getChaveCaixa() {
   try {
-    const chaveRetorno = await retornaCampo('chave');
+    let chaveRetorno = await retornaCampo('chave');
     ChaveCaixa = chaveRetorno;
   } catch (err) {
     console.error('Erro ao retornar dados:', err);
   }
 }
 
+function getData(data){
+    DateTime = data + ':00-03:0';
+    return DateTime;
+}
+
 // Função assíncrona para retornar o Dominio
 async function getDominio() {
   try {
-    const dominioRetorno = await retornaCampo('dominio');
+    let dominioRetorno = await retornaCampo('dominio');
     Dominio = dominioRetorno;
   } catch (err) {
     console.error('Erro ao retornar dados:', err);
@@ -55,7 +60,7 @@ async function codificarXmlReqCadastro() {
       <TpArquivo>50</TpArquivo>
       <ChaveCaixa>${ChaveCaixa}</ChaveCaixa>
       <TpSync>${TpSync}</TpSync>
-      <DhReferencia>2023-04-20T00:50:07-03:0</DhReferencia>
+      <DhReferencia>${DateTime}</DhReferencia>
     </xmlIntegracao>`);
   } catch (err) {
     console.error('Erro ao codificar xmlReqCadastro:', err);
@@ -119,8 +124,13 @@ function reqCadastros(Sync) {
 }
 
 
+function sincronizacaoUnica(data){
+    console.log(getData(data));
+    reqCadastros('1');
+}
+
 module.exports = {
   setDate, 
   setSenha,
-  reqCadastros
+  sincronizacaoUnica
 };

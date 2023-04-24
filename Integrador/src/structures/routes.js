@@ -1,5 +1,6 @@
-function chamarFuncaoNoServidor() {
-    fetch('http://localhost:3000/reqCadastro')
+function sincronizacaoUnica() {
+    let data = document.getElementById('datetime-input').value;
+    fetch(`http://localhost:3000/sincronizacaoUnica/${data}`)
         .then(response => response.text())
         .then(data => {
             console.log(data);
@@ -86,6 +87,11 @@ function carregarInfoGeral(){
 }
 
 
+function carregarData(){
+    let data = new Date();
+    data.setHours(data.getHours() - 3);
+    document.getElementById('datetime-input').value = data.toISOString().slice(0, 16);;
+}
 
 function clique(){
     alert('Hello World');
@@ -99,5 +105,5 @@ window.onload = function(){
     carregarInfoSaurus();
     carregarInfoGeral();
 };
-/*document.getElementById('caminho-input').value = dados[0];
-        document.getElementById('timer-input').value = dados[1];*/
+
+carregarData();

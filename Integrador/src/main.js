@@ -1,7 +1,7 @@
 // IMPORTANDO MÓDULOS E BIBLIOTECAS 
 const express = require('express');
 const { salvarDados, retornarDados } = require('./structures/manipulacaoJSON');
-const { reqCadastros } = require('./structures/reqCadastros');
+const { sincronizacaoUnica } = require('./structures/reqCadastros');
 
 // AREA TESTE
 
@@ -18,8 +18,8 @@ const { reqCadastros } = require('./structures/reqCadastros');
 
 const expss = express();
 
-expss.get('/reqCadastro', (req, res) => {
-    reqCadastros('1');
+expss.get('/sincronizacaoUnica/:data', (req, res) => {
+    sincronizacaoUnica(req.params.data);
     console.log('Função executada no servidor!');
 });
 
@@ -63,7 +63,7 @@ require("electron-reload")(__dirname, {
 // Função que cria uma janela desktop
 function createWindow() {
   // Adicionando um ícone na barra de tarefas/dock
-  const icon = nativeImage.createFromPath(`${app.getAppPath()}/build/icon.png`);
+  const icon = nativeImage.createFromPath(`${app.getAppPath()}/build/icon.jpg`);
 
   if (app.dock) {
     app.dock.setIcon(icon);
