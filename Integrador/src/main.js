@@ -86,7 +86,6 @@ function createWindow() {
 
 
 ipcMain.on('execute-function', () => {
-  // Execute sua função aqui
   console.log('Executando função...')
 })
 

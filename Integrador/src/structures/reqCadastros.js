@@ -1,8 +1,8 @@
 /* ---------------------- IMPORTAÇÃO DE MÓDULOS ----------------------*/
-const { codificarInBase64 } = require('./tratamentoDados');
+const { codificarInBase64, decodificarBase64 } = require('./tratamentoDados');
 const { retornaCampo } = require('./manipulacaoJSON');
 const axios = require('axios');
-const fs = require('fs');
+const xml2js = require('xml2js');
 
 var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync; // Declarar as variáveis
 
@@ -55,7 +55,7 @@ async function codificarXmlReqCadastro() {
       <TpArquivo>50</TpArquivo>
       <ChaveCaixa>${ChaveCaixa}</ChaveCaixa>
       <TpSync>${TpSync}</TpSync>
-      <DhReferencia>2021-04-13T12:50:07-03:0</DhReferencia>
+      <DhReferencia>2023-04-20T00:50:07-03:0</DhReferencia>
     </xmlIntegracao>`);
   } catch (err) {
     console.error('Erro ao codificar xmlReqCadastro:', err);
@@ -97,12 +97,17 @@ function reqCadastros(Sync) {
         </soap:Body>
       </soap:Envelope>`
 
-      console.log('Dominio: ' + Dominio);
-      console.log('Chave Caixa: ' + ChaveCaixa);
-      console.log(xBytesParametros);
+    
       axios.post('https://wscadastros.saurus.net.br/v001/serviceCadastros.asmx', body, { headers })
         .then((response) => {
-          console.log('Resposta:', response.data);
+          xml2js.parseString(response.data, (err, result) => {
+            if (err) {
+              console.error(err);
+            } else {
+              let retCadastrosResult = result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult[0];
+              console.log(decodificarBase64(retCadastrosResult));
+            }
+          });
         })
         .catch((error) => {
           console.error('Erro na requisição:', error);

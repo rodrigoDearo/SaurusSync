@@ -39,11 +39,12 @@ function criarEziparArquivoXml(){
    * @returns {text} - Retorna string decodifica em ascii
    */
   function decodificarBase64(data){
-    let text = new Buffer.from(data, 'base64').toString('ascii');
-    return text;
+    let decodedString = new Buffer.from(data, 'base64').toString('ascii');
+    return decodedString;
   }
 
-  
+
+
   module.exports = {
     decodificarBase64,
     codificarInBase64,
