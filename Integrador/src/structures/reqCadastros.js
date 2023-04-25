@@ -11,8 +11,7 @@ var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync, DateTime; // Declar
 function setDate(){
   let data = new Date();  // FUNÇÃO PADRÃO NDOE PARA PUXAR DATA;
   data.setHours(data.getHours() - 3);
-  data.setSeconds(data.getSeconds() - 15);
-  data.setMinutes(data.getMinutes() - 1);
+  data.setMinutes(data.getMinutes() - 15);
   let dataISO8601 = data.toISOString(); // TRANSFORMA NO PADRÃO DE DATA ISO8601
   data = dataISO8601.slice(0, -5);  //RETIRA OS 5DÍTIGOT SINAIS PARA DEIXAR NO PADRÃO SOLICITADO
   data += '-03:0'; //ADICIONA FUSO HORÁRIO DE BRASILIA
