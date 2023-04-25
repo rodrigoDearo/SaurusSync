@@ -4,20 +4,24 @@ const { retornaCampo } = require('./manipulacaoJSON');
 const axios = require('axios');
 const xml2js = require('xml2js');
 
+
 var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync, DateTime; // Declarar as variáveis
 
 // ...resto do código...
 function setDate(){
   let data = new Date();  // FUNÇÃO PADRÃO NDOE PARA PUXAR DATA;
+  data.setHours(data.getHours() - 3);
+  data.setSeconds(data.getSeconds() - 15);
+  data.setMinutes(data.getMinutes() - 1);
   let dataISO8601 = data.toISOString(); // TRANSFORMA NO PADRÃO DE DATA ISO8601
   data = dataISO8601.slice(0, -5);  //RETIRA OS 5DÍTIGOT SINAIS PARA DEIXAR NO PADRÃO SOLICITADO
-  data += '-03:00'; //ADICIONA FUSO HORÁRIO DE BRASILIA
-  return data;
+  data += '-03:0'; //ADICIONA FUSO HORÁRIO DE BRASILIA
+  DateTime = data;
+  return DateTime;
 }
 
 function setSenha(){
   let dataAtual = new Date();
-
   let dia = dataAtual.getDate();
   let mes = dataAtual.getMonth();
   let ano = dataAtual.getFullYear() + 1;
@@ -101,7 +105,7 @@ function reqCadastros(Sync) {
           </retCadastros>
         </soap:Body>
       </soap:Envelope>`
-
+      console.log(body);
     
       axios.post('https://wscadastros.saurus.net.br/v001/serviceCadastros.asmx', body, { headers })
         .then((response) => {
@@ -109,8 +113,13 @@ function reqCadastros(Sync) {
             if (err) {
               console.error(err);
             } else {
-              let retCadastrosResult = result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult[0];
-              decodificarEsalvar(retCadastrosResult);
+              if ((result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult) == undefined){
+                console.log('Sem mudanças a serem carregadas');
+                console.log(response.data);
+              } else{
+                let retCadastrosResult = result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult[0];
+                decodificarEsalvar(retCadastrosResult);
+              }
             }
           });
         })
@@ -131,7 +140,13 @@ function sincronizacaoUnica(data){
 
 function sincronizacaoContinua(data){
   getData(data);
-  reqCadastros('2');
+  reqCadastros('1');
+  console.log(DateTime);
+  setInterval(function() {
+    setDate();
+    console.log(DateTime);
+    reqCadastros('1');
+  }, 75000);
 }
 
 module.exports = {

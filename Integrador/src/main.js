@@ -15,7 +15,6 @@ const { sincronizacaoUnica, sincronizacaoContinua } = require('./structures/reqC
 
 // ---------------------- EXPRESS JS ---------------------- //
 
-
 const expss = express();
 
 expss.get('/sincronizacaoUnica/:data', (req, res) => {
@@ -107,7 +106,3 @@ app.on("activate", () => {
     createWindow();
   }
 });
-
-
-
-
