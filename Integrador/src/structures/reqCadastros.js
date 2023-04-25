@@ -105,7 +105,6 @@ function reqCadastros(Sync) {
           </retCadastros>
         </soap:Body>
       </soap:Envelope>`
-      console.log(body);
     
       axios.post('https://wscadastros.saurus.net.br/v001/serviceCadastros.asmx', body, { headers })
         .then((response) => {
@@ -115,7 +114,6 @@ function reqCadastros(Sync) {
             } else {
               if ((result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult) == undefined){
                 console.log('Sem mudanças a serem carregadas');
-                console.log(response.data);
               } else{
                 let retCadastrosResult = result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult[0];
                 decodificarEsalvar(retCadastrosResult);

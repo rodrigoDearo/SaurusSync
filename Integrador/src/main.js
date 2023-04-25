@@ -24,8 +24,13 @@ expss.get('/sincronizacaoUnica/:data', (req, res) => {
 
 expss.get('/sincronizacaoContinua/:data', (req, res) =>{
     sincronizacaoContinua(req.params.data);
+    const win = BrowserWindow.getAllWindows()[0];
+    setInterval(() => {
+      win.reload();
+      console.log('App recarregado');
+    }, 60000);
     console.log('Sincronização Contínua Executada');
-})
+});
 
 expss.get('/closeApp', (req, res) => {
     console.log('Função de fechamento do APP executada !');
