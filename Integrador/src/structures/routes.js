@@ -2,8 +2,16 @@
  * 
  */
 function sincronizacaoUnica() {
-    let data = document.getElementById('datetime-input').value;
-    fetch(`http://localhost:3000/sincronizacaoUnica/${data}`)
+    let dataInput = document.getElementById('datetime-input').value;
+    let dataAtual = new Date();
+    dataAtual.setMinutes(dataAtual.getMinutes() + 9);
+    let dataISO8601 = dataAtual.toISOString();
+
+    if(dataInput < dataISO8601){
+        alert('Favor, insira um horário com 10 minutos ou mais de antecedência ao horário atual');
+    }
+    else{
+        fetch(`http://localhost:3000/sincronizacaoUnica/${dataInput}`)
         .then(response => response.text())
         .then(data => {
             console.log(data);
@@ -11,6 +19,7 @@ function sincronizacaoUnica() {
         .catch(error => {
             console.error(error);
         });
+    }
 }
 
 
@@ -18,15 +27,33 @@ function sincronizacaoUnica() {
  * 
  */
 function sincronizacaoContinua(){
-    let data = document.getElementById('datetime-input').value;
-    fetch(`http://localhost:3000/sincronizacaoContinua/${data}`)
-        .then(response => response.text())
-        .then(data => {
-            console.log(data);
-        })
-        .catch(error => {
-            console.error(error);
-        });
+    let sincronizar;
+
+    let dataInput = document.getElementById('datetime-input').value;
+    let dataAtual = new Date();
+    dataAtual.setMinutes(dataAtual.getMinutes() + 9);
+    let dataISO8601 = dataAtual.toISOString();
+
+    if(dataInput < dataISO8601){
+        sincronizar = confirm('Caso tenha inserido/modificado/deletado algum produto nos últimos 10 minutos, essa modificação não será carregada. Deseja prosseguir ou voltar e inserir um horário inicial maior?');
+    }
+    else{
+        sincronizar = false;
+        console.log('Cancelado pedido de sincronização');
+    }
+
+    if(sincronizar==true){
+        document.getElementById("botaoSincCont").disabled = true;
+        document.getElementById("botaoSincUn").disabled = true;
+        fetch(`http://localhost:3000/sincronizacaoContinua/${dataInput}`)
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
 }
 
 
@@ -58,6 +85,9 @@ function saveSaurus(){
         console.log('Fetch concluido');
         console.log(data);
     })
+    .then(() => {
+        alert('DADOS ATUALIZADOS COM SUCESSO');
+    })
     .catch(error =>{
         confirm.log(error);
     })
@@ -68,16 +98,28 @@ function saveSaurus(){
  * Função de requisição para porta 3000 para gravar dados do cadastro de informações Gerais do app
  */
 function saveGeral(){
-    let timer = document.getElementById('timer-input').value;
-    fetch(`http://localhost:3000/saveGeral/${timer}`)
-    .then(response => response.text())
-    .then(data =>{
-        console.log('Fetch concluido');
-        console.log(data);
-    })
-    .catch(error =>{
-        confirm.log(error);
-    })
+    let timerInput = document.getElementById('timer-input').value;
+    let time = timerInput.split(":");
+    let segundos = (+time[0]) * 60 + (+time[1]);
+
+    if(segundos < 600){
+        alert('Favor, insira um timer de requisição superior a 10 minutos;')
+    }
+    else{
+        
+        fetch(`http://localhost:3000/saveGeral/${timerInput}`)
+        .then(response => response.text())
+        .then(data =>{
+            console.log('Fetch concluido');
+            console.log(data);
+        })
+        .then(() =>{
+            alert('TIMER ATUALIZADO COM SUCESSO!')
+        })
+        .catch(error =>{
+            confirm.log(error);
+        })
+    }
 }
 
 

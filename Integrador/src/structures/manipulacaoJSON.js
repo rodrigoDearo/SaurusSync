@@ -83,6 +83,10 @@ function retornaCampo(campo){
           case 'dominio':
             var dadosRetorno = dados.dadosApp.saurus.dominio;
             break;
+
+          case 'timer':
+            var dadosRetorno = dados.dadosApp.geral.timer;
+            break;
           
         }
         resolve(dadosRetorno);

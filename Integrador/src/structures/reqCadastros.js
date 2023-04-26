@@ -4,18 +4,21 @@ const { retornaCampo } = require('./manipulacaoJSON');
 const axios = require('axios');
 const xml2js = require('xml2js');
 
-
-var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync, DateTime; // Declarar as variáveis
+var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync, DateTime, minutos, segundos; // Declarar as variáveis
+/*var minutos = timerRetorno.substring(0, 2);
+var segundos = timerRetorno.substring(3, 5);*/
 
 // ...resto do código...
 function setDate(){
   let data = new Date();  // FUNÇÃO PADRÃO NDOE PARA PUXAR DATA;
   data.setHours(data.getHours() - 3);
-  data.setMinutes(data.getMinutes() - 15);
+  data.setMinutes(data.getMinutes() - minutos - 2);
+  data.setSeconds(data.getSeconds() - segundos); 
   let dataISO8601 = data.toISOString(); // TRANSFORMA NO PADRÃO DE DATA ISO8601
   data = dataISO8601.slice(0, -5);  //RETIRA OS 5DÍTIGOT SINAIS PARA DEIXAR NO PADRÃO SOLICITADO
   data += '-03:0'; //ADICIONA FUSO HORÁRIO DE BRASILIA
   DateTime = data;
+  console.log(DateTime)
   return DateTime;
 }
 
@@ -37,6 +40,17 @@ async function getChaveCaixa() {
     ChaveCaixa = chaveRetorno;
   } catch (err) {
     console.error('Erro ao retornar dados:', err);
+  }
+}
+
+async function getTimerJSON(){
+  try {
+    let timerRetorno = await retornaCampo('timer');
+    let timerValor = timerRetorno.toString();
+    minutos = parseInt(timerValor.substring(0, 2));
+    segundos = parseInt(timerValor.substring(3, 5));
+  } catch (err) {
+    console.error('Erro ao pegar timer JSON', err);
   }
 }
 
@@ -69,7 +83,7 @@ async function codificarXmlReqCadastro() {
     console.error('Erro ao codificar xmlReqCadastro:', err);
   }
 }
-
+console.log(xBytesParametros);
 // Função assíncrona para codificar a senha
 async function codificarSenha(){
   try{
@@ -112,7 +126,7 @@ function reqCadastros(Sync) {
               console.error(err);
             } else {
               if ((result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult) == undefined){
-                console.log('Sem mudanças a serem carregadas');
+                console.log('Sem mudancas a serem carregadas');
               } else{
                 let retCadastrosResult = result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult[0];
                 decodificarEsalvar(retCadastrosResult);
@@ -136,14 +150,17 @@ function sincronizacaoUnica(data){
 }
 
 function sincronizacaoContinua(data){
-  getData(data);
-  reqCadastros('1');
-  console.log(DateTime);
-  setInterval(function() {
-    setDate();
-    console.log(DateTime);
+  getTimerJSON()
+  .then(() => {
+    getData(data);
     reqCadastros('1');
-  }, 75000);
+    console.log(DateTime);
+    setInterval(function() {
+      setDate();
+      console.log(DateTime);
+      reqCadastros('1');
+    }, ((minutos*60)+segundos)*1000);
+  })
 }
 
 module.exports = {
