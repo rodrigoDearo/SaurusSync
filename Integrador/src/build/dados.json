@@ -5,7 +5,7 @@
       "dominio": "testesdrsistema"
     },
     "geral": {
-      "timer": "10:00"
+      "timer": "20:00"
     },
     "tray": {}
   }

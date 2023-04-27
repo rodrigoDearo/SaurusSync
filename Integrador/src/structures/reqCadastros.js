@@ -4,16 +4,11 @@ const { retornaCampo } = require('./manipulacaoJSON');
 const axios = require('axios');
 const xml2js = require('xml2js');
 
-var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync, DateTime, minutos, segundos; // Declarar as variáveis
-/*var minutos = timerRetorno.substring(0, 2);
-var segundos = timerRetorno.substring(3, 5);*/
-
+var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync, DateTime;
 // ...resto do código...
 function setDate(){
+  console.log('cheguei aqui')
   let data = new Date();  // FUNÇÃO PADRÃO NDOE PARA PUXAR DATA;
-  data.setHours(data.getHours() - 3);
-  data.setMinutes(data.getMinutes() - minutos - 2);
-  data.setSeconds(data.getSeconds() - segundos); 
   let dataISO8601 = data.toISOString(); // TRANSFORMA NO PADRÃO DE DATA ISO8601
   data = dataISO8601.slice(0, -5);  //RETIRA OS 5DÍTIGOT SINAIS PARA DEIXAR NO PADRÃO SOLICITADO
   data += '-03:0'; //ADICIONA FUSO HORÁRIO DE BRASILIA
@@ -43,19 +38,9 @@ async function getChaveCaixa() {
   }
 }
 
-async function getTimerJSON(){
-  try {
-    let timerRetorno = await retornaCampo('timer');
-    let timerValor = timerRetorno.toString();
-    minutos = parseInt(timerValor.substring(0, 2));
-    segundos = parseInt(timerValor.substring(3, 5));
-  } catch (err) {
-    console.error('Erro ao pegar timer JSON', err);
-  }
-}
-
 function getData(data){
     DateTime = data + ':00-03:0';
+    console.log(DateTime);
     return DateTime;
 }
 
@@ -118,9 +103,10 @@ function reqCadastros(Sync) {
           </retCadastros>
         </soap:Body>
       </soap:Envelope>`
-    
+      console.log(body);
       axios.post('https://wscadastros.saurus.net.br/v001/serviceCadastros.asmx', body, { headers })
         .then((response) => {
+          console.log(response.data);
           xml2js.parseString(response.data, (err, result) => {
             if (err) {
               console.error(err);
@@ -145,27 +131,14 @@ function reqCadastros(Sync) {
 
 
 function sincronizacaoUnica(data){
+  console.log('Cheguei');
     getData(data);
     reqCadastros('1');
 }
-
-function sincronizacaoContinua(data){
-  getTimerJSON()
-  .then(() => {
-    getData(data);
-    reqCadastros('1');
-    console.log(DateTime);
-    setInterval(function() {
-      setDate();
-      console.log(DateTime);
-      reqCadastros('1');
-    }, ((minutos*60)+segundos)*1000);
-  })
-}
+  
 
 module.exports = {
   setDate, 
   setSenha,
   sincronizacaoUnica,
-  sincronizacaoContinua
 };

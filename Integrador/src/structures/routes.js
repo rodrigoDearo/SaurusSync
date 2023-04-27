@@ -3,58 +3,22 @@
  */
 function sincronizacaoUnica() {
     let dataInput = document.getElementById('datetime-input').value;
-    let dataAtual = new Date();
-    dataAtual.setMinutes(dataAtual.getMinutes() + 9);
-    let dataISO8601 = dataAtual.toISOString();
 
-    if(dataInput < dataISO8601){
-        alert('Favor, insira um horário com 10 minutos ou mais de antecedência ao horário atual');
-    }
-    else{
-        fetch(`http://localhost:3000/sincronizacaoUnica/${dataInput}`)
-        .then(response => response.text())
-        .then(data => {
-            console.log(data);
-        })
-        .catch(error => {
-            console.error(error);
-        });
-    }
+    fetch(`http://localhost:3000/sincronizacaoUnica/${dataInput}`)
+    .then(response => response.text())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error(error);
+    })
 }
 
 
 /**
  * 
  */
-function sincronizacaoContinua(){
-    let sincronizar;
 
-    let dataInput = document.getElementById('datetime-input').value;
-    let dataAtual = new Date();
-    dataAtual.setMinutes(dataAtual.getMinutes() + 9);
-    let dataISO8601 = dataAtual.toISOString();
-
-    if(dataInput < dataISO8601){
-        sincronizar = confirm('Caso tenha inserido/modificado/deletado algum produto nos últimos 10 minutos, essa modificação não será carregada. Deseja prosseguir ou voltar e inserir um horário inicial maior?');
-    }
-    else{
-        sincronizar = false;
-        console.log('Cancelado pedido de sincronização');
-    }
-
-    if(sincronizar==true){
-        document.getElementById("botaoSincCont").disabled = true;
-        document.getElementById("botaoSincUn").disabled = true;
-        fetch(`http://localhost:3000/sincronizacaoContinua/${dataInput}`)
-            .then(response => response.text())
-            .then(data => {
-                console.log(data);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    }
-}
 
 
 /**
