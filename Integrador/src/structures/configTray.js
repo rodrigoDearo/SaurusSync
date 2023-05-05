@@ -1,10 +1,14 @@
 /* ---------------------- IMPORTAÇÃO DE MÓDULOS ----------------------*/
 const axios = require('axios');
 const fs = require('fs');
-const xml2js = require('xml2js');
 
-var consumerSecret, consumerKey, code, url;
+var consumerSecret, consumerKey, code, url, tokenRefresh;
 
+
+/**
+ * Função para gravar no arquivo dados.JSOn as informações retornadas na requisição
+ * @param {*} dados 
+ */
 function gravarDados(dados) {
     fs.readFile('./src/build/dados.json', 'utf-8', (err, data) => {
       if (err) {
@@ -17,7 +21,7 @@ function gravarDados(dados) {
       arquivoJSON.dadosApp.tray.refresh_token = dados.refresh_token;
       arquivoJSON.dadosApp.tray.date_expiration_access_token = dados.date_expiration_access_token;
       arquivoJSON.dadosApp.tray.date_expiration_refresh_token = dados.date_expiration_refresh_token;
-  
+      
       fs.writeFile('./src/build/dados.json', JSON.stringify(arquivoJSON), (err) => {
         if (err) {
           console.error(err);
@@ -28,6 +32,12 @@ function gravarDados(dados) {
     });
   }  
   
+
+
+/**
+ * Função para ler dados.json e parametrizar valores a serem enviados nas requisições
+ * @returns gravação dos valores usados na requisição
+ */
 function leituraDosDados() {
     return new Promise((resolve, reject) => {
       fs.readFile('./src/build/dados.json', 'utf-8', (err, data) => {
@@ -42,8 +52,9 @@ function leituraDosDados() {
           consumerKey = dados.dadosApp.tray.consumer_key;
           consumerSecret = dados.dadosApp.tray.consumer_secret;
           code = dados.dadosApp.tray.code;
-          url = dados.dadosApp.tray.url + '/auth';
-  
+          url = dados.dadosApp.tray.url;
+          tokenRefresh = dados.dadosApp.tray.refresh_token;
+          
           resolve();
         } catch {
           console.log('Erro na leitura');
@@ -52,7 +63,12 @@ function leituraDosDados() {
       });
     });
   }
+
+
   
+/**
+ * Função para gerar o token de acesso, função executado quando será gerado o acess_token do cliente pela primeira vez ou quando refresh_token vence
+ */
 async function createToken() {
     try {
         await leituraDosDados();
@@ -68,7 +84,7 @@ async function createToken() {
             }
         };
   
-        axios.post(url, keysValue, config)
+        axios.post(`${url}/auth`, keysValue, config)
         .then((response) => {
             gravarDados(response.data);
         })
@@ -81,10 +97,29 @@ async function createToken() {
     }
 }
 
-function refreshToken(){
 
+/**
+ * 
+ */
+async function refreshToken(){
+    try {
+        await leituraDosDados();
+        axios.get(`${url}/auth`, { params:{
+            refresh_token: tokenRefresh
+        } })
+        .then((response) => {
+            gravarDados(response.data);
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+    }
+    catch(error){
+        console.err(error);
+    }
 }
 
 module.exports = {
-    createToken
+    createToken,
+    refreshToken
 };
