@@ -11,11 +11,11 @@
       "consumer_key": "9f52214d3ff8cf0629d1fcfa3bd6a5b5e4fbc21a62305a7d6b450dc64a90cf68",
       "consumer_secret": "68e7ba3319a5b96eece177867a3c6212e7ec930c0ac89b719e1adcaaa6bc380f",
       "code": "dca5f05b40953367511bafc9cf7cc1f54a69ba6179b1078b55626d4323b6dbe1",
-      "access_token": "",
-      "refresh_token": "",
-      "date_expiration_access_token": "",
-      "date_expiration_refresh_token": "",
-      "url": ""
+      "access_token": "APP_ID-5005-STORE_ID-391250-116899e32b61e76bf6c2e700c8d4f4e9a1674daae69d145bc7ad93da0e3d1068",
+      "refresh_token": "9e5f8f681d728813d01f243a854a3ef6a35445fcc01396d00ee31e7212dc8e68",
+      "date_expiration_access_token": "2023-05-05 12:28:25",
+      "date_expiration_refresh_token": "2023-06-04 09:28:25",
+      "url": "https://391250.commercesuite.com.br/web_api/auth"
     }
   }
 }
