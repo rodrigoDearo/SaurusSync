@@ -7,6 +7,15 @@
     "geral": {
       "timer": "20:00"
     },
-    "tray": {}
+    "tray": {
+      "consumer_key": "",
+      "consumer_secret": "",
+      "code": "",
+      "access_token": "",
+      "refresh_token": "",
+      "date_expiration_access_token": "",
+      "date_expiration_refresh_token": "",
+      "url": ""
+    }
   }
 }
