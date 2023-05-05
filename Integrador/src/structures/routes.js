@@ -124,6 +124,20 @@ function carregarInfoSaurus(){
 
 
 /**
+ * Função de requisição para porta 3000 para carregar valores dos campos "value" dos inputs HTML Tray
+ */
+function carregarInfoTray(){
+    fetch('http://localhost:3000/carregarInfo')
+    .then(response => response.json())
+    .then(dados =>{
+        document.getElementById('consumerkey-input').value = dados[3];
+        document.getElementById('consumersecret-input').value = dados[4];
+        document.getElementById('code-input').value = dados[5];
+    });
+}
+
+
+/**
  * Função de requisição para porta 3000 para carregar valores dos campos "value" dos inputs HTML geral
  */
 function carregarInfoGeral(){
@@ -152,6 +166,7 @@ function carregarData(){
 window.onload = function(){
     carregarInfoSaurus();
     carregarInfoGeral();
+    carregarInfoTray();
 };
 
 carregarData();

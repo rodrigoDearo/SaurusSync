@@ -62,7 +62,10 @@ function retornarDados() {
         var dadosRetorno = [
           dados.dadosApp.saurus.chave,
           dados.dadosApp.saurus.dominio,
-          dados.dadosApp.geral.timer
+          dados.dadosApp.geral.timer,
+          dados.dadosApp.tray.consumer_key,
+          dados.dadosApp.tray.consumer_secret,
+          dados.dadosApp.tray.code
         ];
         resolve(dadosRetorno);
       }
