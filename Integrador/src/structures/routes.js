@@ -59,6 +59,29 @@ function saveSaurus(){
 
 
 /**
+ * Função de requisição para porta 3000 para gravar dados do cadastro de informações da Tray
+ */
+function saveTray(){
+    let consumer_key = document.getElementById('consumerkey-input').value;
+    let consumer_secret = document.getElementById('consumersecret-input').value;
+    let code = document.getElementById('code-input').value;
+
+    fetch(`http://localhost:3000/saveTray/${consumer_key}/${consumer_secret}/${code}`)
+    .then(response => response.text())
+    .then(data =>{
+        console.log('Fetch concluido');
+        console.log(data);
+    })
+    .then(() => {
+        alert('DADOS ATUALIZADOS COM SUCESSO');
+    })
+    .catch(error =>{
+        confirm.log(error);
+    })
+}
+
+
+/**
  * Função de requisição para porta 3000 para gravar dados do cadastro de informações Gerais do app
  */
 function saveGeral(){

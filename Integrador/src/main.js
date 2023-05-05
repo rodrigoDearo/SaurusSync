@@ -28,11 +28,15 @@ expss.get('/closeApp', (req, res) => {
 });
 
 expss.get(`/saveSaurus/:chave/:dominio`, (req, res) => {
-  salvarDados(req.params.chave, req.params.dominio, 'saurus');
+  salvarDados(req.params.chave, req.params.dominio, null, 'saurus');
+});
+
+expss.get(`/saveTray/:consumer_key/:consumer_secret/:code`, (req, res) => {
+  salvarDados(req.params.consumer_key, req.params.consumer_secret, req.params.code, 'tray');
 });
 
 expss.get(`/saveGeral/:timer`, (req, res) =>{
-  salvarDados(req.params.timer, null, 'geral');
+  salvarDados(req.params.timer, null, null, 'geral');
 });
 
 expss.get(`/carregarInfo`, (req, res) =>{
