@@ -99,7 +99,7 @@ async function createToken() {
 
 
 /**
- * 
+ * Função para renovar token de acesso, será executada qando expirar data valida para o acess_token
  */
 async function refreshToken(){
     try {
@@ -108,6 +108,7 @@ async function refreshToken(){
             refresh_token: tokenRefresh
         } })
         .then((response) => {
+            console.log(response.data)
             gravarDados(response.data);
         })
         .catch((error) => {
