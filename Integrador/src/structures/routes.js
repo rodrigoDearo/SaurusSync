@@ -2,16 +2,11 @@
  * 
  */
 function sincronizacaoUnica() {
-    let dataInput = document.getElementById('datetime-input').value;
-    let dataAtual = new Date();
-    dataAtual.setMinutes(dataAtual.getMinutes() + 9);
-    let dataISO8601 = dataAtual.toISOString();
-
-    if(dataInput < dataISO8601){
-        alert('Favor, insira um horário com 10 minutos ou mais de antecedência ao horário atual');
-    }
-    else{
-        fetch(`http://localhost:3000/sincronizacaoUnica/${dataInput}`)
+    let datetimeInput = document.getElementById('datetime-input').value;
+    let datetimeValue = new Date(datetimeInput);
+    let dateTimeNow = new Date();
+    if(dateTimeNow.getTime() - datetimeValue.getTime() >= 10 * 60 * 1000){
+        fetch(`http://localhost:3000/sincronizacaoUnica/${datetimeInput}`)
         .then(response => response.text())
         .then(data => {
             console.log(data);
@@ -19,6 +14,9 @@ function sincronizacaoUnica() {
         .catch(error => {
             console.error(error);
         });
+    }
+    else{
+        alert('Favor, insira um horário com 10 minutos ou mais de antecedência ao horário atual');
     }
 }
 
