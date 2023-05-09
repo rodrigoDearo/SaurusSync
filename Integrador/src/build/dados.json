@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "dadosApp": {
     "saurus": {
       "chave": "0F38F081-6B77-4464-8C7E-FC686FB5B57B",
@@ -9,4 +10,25 @@
     },
     "tray": {}
   }
+=======
+    "dadosApp": {
+        "saurus": {
+            "chave": "0F38F081-6B77-4464-8C7E-FC686FB5B57B",
+            "dominio": "testesdrsistema"
+        },
+        "geral": {
+            "timer": "20:00"
+        },
+        "tray": {
+            "consumer_key": "9f52214d3ff8cf0629d1fcfa3bd6a5b5e4fbc21a62305a7d6b450dc64a90cf68",
+            "consumer_secret": "68e7ba3319a5b96eece177867a3c6212e7ec930c0ac89b719e1adcaaa6bc380f",
+            "code": "dca5f05b40953367511bafc9cf7cc1f54a69ba6179b1078b55626d4323b6dbe1",
+            "access_token": "APP_ID-5005-STORE_ID-391250-3eeab043db98cd96b012526a002f5cd9375ebef97e6c92e6c85f574c1ab0e3f5",
+            "refresh_token": "00eb4b441518c43ae45bf571216c29b1ad7aa965ea80cc9a61199daf716b39e6",
+            "date_expiration_access_token": "2023-05-06 12:44:12",
+            "date_expiration_refresh_token": "2023-06-05 09:44:12",
+            "url": "https://391250.commercesuite.com.br/web_api"
+        }
+    }
+>>>>>>> sincronizacao-continua
 }

@@ -6,7 +6,7 @@ const fs = require('fs');
  * @param {*} campo2 Caso não nuulo, é outra informalção para ser cadastrada
  * @param {string} systemSave Informa qual tabela do arquivo JSOn pertence a informação
  */
-function salvarDados(campo1, campo2, systemSave){
+function salvarDados(campo1, campo2, campo3, systemSave){
   fs.readFile('./src/build/dados.json', 'utf-8', (err, data) => {
     if (err) {
       console.error(err);
@@ -27,6 +27,9 @@ function salvarDados(campo1, campo2, systemSave){
         break;
 
       case 'tray':
+        dadosApp.dadosApp.tray.consumer_key = campo1;
+        dadosApp.dadosApp.tray.consumer_secret = campo2;
+        dadosApp.dadosApp.tray.code = campo3;
         break;
     }
   
@@ -59,7 +62,10 @@ function retornarDados() {
         var dadosRetorno = [
           dados.dadosApp.saurus.chave,
           dados.dadosApp.saurus.dominio,
-          dados.dadosApp.geral.timer
+          dados.dadosApp.geral.timer,
+          dados.dadosApp.tray.consumer_key,
+          dados.dadosApp.tray.consumer_secret,
+          dados.dadosApp.tray.code
         ];
         resolve(dadosRetorno);
       }
@@ -82,10 +88,6 @@ function retornaCampo(campo){
           
           case 'dominio':
             var dadosRetorno = dados.dadosApp.saurus.dominio;
-            break;
-
-          case 'timer':
-            var dadosRetorno = dados.dadosApp.geral.timer;
             break;
           
         }

@@ -33,12 +33,28 @@
                 <a href="configSaurus.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Configurações Saurus</button></a>
                 <a href="#" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Configurações Tray</button></a>
                 <a href="configGeral.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Configurações Gerais</button></a>
-                <a href="consultStatus.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Consultar Status</button></a>
                 <a href="startSync.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Sincronizar</button></a>
               </div>
         </div>
     </div>
 
+    <form class="container-fluid col-8" id="formularioFull-tray">
+        <div class="mb-3">
+          <label class="form-label">Consumer Key</label>
+          <input type="text" id="consumerkey-input" class="form-control input-text" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Consumer Secret</label>
+            <input type="text" id="consumersecret-input" class="form-control input-text" required>
+          </div>
+
+        <div class="mb-3" id="last-input-tray">
+            <label class="form-label">Code</label>
+            <input type="text" id="code-input" class="form-control input-text" required>
+        </div>
+        <button type="submit" onclick="saveTray()" class="btn btn-primary container botao-save">Salvar</button>
+      </form>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="../main.js" type="module"></script>
