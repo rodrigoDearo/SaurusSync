@@ -12,7 +12,7 @@ var segundos = timerRetorno.substring(3, 5);*/
 function setDate(){
   let data = new Date();  // FUNÇÃO PADRÃO NDOE PARA PUXAR DATA;
   data.setHours(data.getHours() - 3);
-  data.setMinutes(data.getMinutes() - minutos - 2);
+  data.setMinutes(data.getMinutes() - minutos);
   data.setSeconds(data.getSeconds() - segundos); 
   let dataISO8601 = data.toISOString(); // TRANSFORMA NO PADRÃO DE DATA ISO8601
   data = dataISO8601.slice(0, -5);  //RETIRA OS 5DÍTIGOT SINAIS PARA DEIXAR NO PADRÃO SOLICITADO
@@ -118,7 +118,7 @@ function reqCadastros(Sync) {
           </retCadastros>
         </soap:Body>
       </soap:Envelope>`
-    
+
       axios.post('https://wscadastros.saurus.net.br/v001/serviceCadastros.asmx', body, { headers })
         .then((response) => {
           xml2js.parseString(response.data, (err, result) => {

@@ -5,6 +5,7 @@ function sincronizacaoUnica() {
     let datetimeInput = document.getElementById('datetime-input').value;
     let datetimeValue = new Date(datetimeInput);
     let dateTimeNow = new Date();
+
     if(dateTimeNow.getTime() - datetimeValue.getTime() >= 10 * 60 * 1000){
         fetch(`http://localhost:3000/sincronizacaoUnica/${datetimeInput}`)
         .then(response => response.text())
@@ -27,23 +28,22 @@ function sincronizacaoUnica() {
 function sincronizacaoContinua(){
     let sincronizar;
 
-    let dataInput = document.getElementById('datetime-input').value;
-    let dataAtual = new Date();
-    dataAtual.setMinutes(dataAtual.getMinutes() + 9);
-    let dataISO8601 = dataAtual.toISOString();
+    let datetimeInput = document.getElementById('datetime-input').value;
+    let datetimeValue = new Date(datetimeInput);
+    let dateTimeNow = new Date();
 
-    if(dataInput < dataISO8601){
-        sincronizar = confirm('Caso tenha inserido/modificado/deletado algum produto nos últimos 10 minutos, essa modificação não será carregada. Deseja prosseguir ou voltar e inserir um horário inicial maior?');
+    if(dateTimeNow.getTime() - datetimeValue.getTime() >= 10 * 60 * 1000){
+        console.log('Tempo superior a 10 minutos');
+        sincronizar = true;
     }
     else{
-        sincronizar = false;
-        console.log('Cancelado pedido de sincronização');
+        sincronizar = confirm('Caso tenha inserido/modificado/deletado algum produto nos últimos 10 minutos, essa modificação não será carregada. Deseja prosseguir ou voltar e inserir um horário inicial maior?');
     }
 
     if(sincronizar==true){
         document.getElementById("botaoSincCont").disabled = true;
         document.getElementById("botaoSincUn").disabled = true;
-        fetch(`http://localhost:3000/sincronizacaoContinua/${dataInput}`)
+        fetch(`http://localhost:3000/sincronizacaoContinua/${datetimeInput}`)
             .then(response => response.text())
             .then(data => {
                 console.log(data);
@@ -51,6 +51,9 @@ function sincronizacaoContinua(){
             .catch(error => {
                 console.error(error);
             });
+    }
+    else{
+        console.log('Cancelado pedido de sincronização');
     }
 }
 

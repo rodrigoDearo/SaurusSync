@@ -46,7 +46,6 @@ function criarEziparArquivoXml(){
         console.error(err);
         return;
       }
-
       let now = moment().utc().format('YYYY-MM-DD');
       let fileName = `cadastros-${now}.xml`;
   
