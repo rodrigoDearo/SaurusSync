@@ -106,3 +106,5 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+refreshToken();

@@ -74,6 +74,11 @@ function retornarDados() {
 }
 
 
+/**
+ * Função que faz a leitura do arquivo JSON das configurações e retorna conforme é solciitado
+ * @param {*} campo parametro referente a qual campo se requisita
+ * @returns {dadosRetorno} retorna o dado lido na gravação JSON
+ */
 function retornaCampo(campo){
   return new Promise((resolve, reject) => {
     fs.readFile('./src/build/dados.json', 'utf-8', (err, data) => {
@@ -88,6 +93,10 @@ function retornaCampo(campo){
           
           case 'dominio':
             var dadosRetorno = dados.dadosApp.saurus.dominio;
+            break;
+
+          case 'timer':
+            var dadosRetorno = dados.dadosApp.geral.timer;
             break;
           
         }

@@ -52,7 +52,7 @@ async function getChaveCaixa() {
 }
 
 /**
- * 
+ * Atribui os valores de minuto e segundo referente ao timer definido na configuração geral
  */
 async function getTimerJSON(){
   try {
@@ -175,18 +175,17 @@ function reqCadastros(Sync) {
 
 
 /**
- * 
- * @param {*} data 
+ * Função para definir horário a ser usado na requisição e chamar função para realizar o consumo da API
+ * @param {*} data parametro referente ao horário a ser usado na requisição
  */
 function sincronizacaoUnica(data){
-  console.log('Cheguei');
     getData(data);
     reqCadastros('1');
 }
 
 /**
- * 
- * @param {*} data 
+ * Função para definir horário a ser usado na requisição e chamar função para realizar o consumo da API
+ * @param {*} data parametro referente ao horário a ser usado na requisição
  */
 function sincronizacaoContinua(data){
   getTimerJSON()
