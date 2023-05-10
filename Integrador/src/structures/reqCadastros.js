@@ -170,10 +170,28 @@ function sincronizacaoUnica(data){
     getData(data);
     reqCadastros('1');
 }
-  
+
+/**
+ * 
+ * @param {*} data 
+ */
+function sincronizacaoContinua(data){
+  getTimerJSON()
+  .then(() => {
+    getData(data);
+    reqCadastros('1');
+    console.log(DateTime);
+    setInterval(function() {
+      setDate();
+      console.log(DateTime);
+      reqCadastros('1');
+    }, ((minutos*60)+segundos)*1000);
+  })
+}
 
 module.exports = {
   setDate, 
   setSenha,
   sincronizacaoUnica,
+  sincronizacaoContinua
 };
