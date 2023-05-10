@@ -2,7 +2,7 @@
 const express = require('express');
 const { salvarDados, retornarDados } = require('./structures/manipulacaoJSON');
 const { sincronizacaoUnica, sincronizacaoContinua } = require('./structures/reqCadastros');
-const { createToken, refreshToken } = require('./structures/configTray');
+const { createToken, refreshToken, cadastrarProduto, atualizarProduto } = require('./structures/configTray');
 
 // AREA TESTE
 
@@ -107,4 +107,9 @@ app.on("activate", () => {
   }
 });
 
-refreshToken();
+atualizarProduto();
+
+/*
+TESTAR DELETE
+VER PARA FAZER FOR COM TODAS AS row DO XML RETORNANDO NO ReqCadastros
+*/

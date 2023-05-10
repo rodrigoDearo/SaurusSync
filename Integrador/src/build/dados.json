@@ -1,21 +1,21 @@
 {
-  "dadosApp": {
-    "saurus": {
-      "chave": "0F38F081-6B77-4464-8C7E-FC686FB5B57B",
-      "dominio": "testesdrsistema"
-    },
-    "geral": {
-      "timer": "15:00"
-    },
-    "tray": {
-      "consumer_key": "9f52214d3ff8cf0629d1fcfa3bd6a5b5e4fbc21a62305a7d6b450dc64a90cf68",
-      "consumer_secret": "68e7ba3319a5b96eece177867a3c6212e7ec930c0ac89b719e1adcaaa6bc380f",
-      "code": "dca5f05b40953367511bafc9cf7cc1f54a69ba6179b1078b55626d4323b6dbe1",
-      "access_token": "APP_ID-5005-STORE_ID-391250-c30c7d467cb916a06ce8ea89e442ea085dd5f024f953763e7593d463d6d610e4",
-      "refresh_token": "54da31cc4f31d8a72ae008e637f5de45923d16431b70efaf3c44599ab5ba0af6",
-      "date_expiration_access_token": "2023-05-09 13:00:56",
-      "date_expiration_refresh_token": "2023-06-08 10:00:56",
-      "url": "https://391250.commercesuite.com.br/web_api"
+    "dadosApp": {
+        "saurus": {
+            "chave": "0F38F081-6B77-4464-8C7E-FC686FB5B57B",
+            "dominio": "testesdrsistema"
+        },
+        "geral": {
+            "timer": "15:00"
+        },
+        "tray": {
+            "consumer_key": "9f52214d3ff8cf0629d1fcfa3bd6a5b5e4fbc21a62305a7d6b450dc64a90cf68",
+            "consumer_secret": "68e7ba3319a5b96eece177867a3c6212e7ec930c0ac89b719e1adcaaa6bc380f",
+            "code": "dca5f05b40953367511bafc9cf7cc1f54a69ba6179b1078b55626d4323b6dbe1",
+            "access_token": "APP_ID-5005-STORE_ID-391250-c3571a1d36076b98afc367eaa8c983f8967bdece5a523f04f7c3165683fb4d5b",
+            "refresh_token": "8a4d53d5abc7f3cd57bacd2ff02be5d0fecb05bc8121c8c6740ee8ab9f618311",
+            "date_expiration_access_token": "2023-05-10 21:51:13",
+            "date_expiration_refresh_token": "2023-06-09 18:51:13",
+            "url": "https://391250.commercesuite.com.br/web_api"
+        }
     }
-  }
 }

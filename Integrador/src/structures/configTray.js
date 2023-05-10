@@ -2,7 +2,7 @@
 const axios = require('axios');
 const fs = require('fs');
 
-var consumerSecret, consumerKey, code, url, tokenRefresh;
+var consumerSecret, consumerKey, code, url, tokenRefresh, acessToken;
 
 
 /**
@@ -54,6 +54,7 @@ function leituraDosDados() {
           code = dados.dadosApp.tray.code;
           url = dados.dadosApp.tray.url;
           tokenRefresh = dados.dadosApp.tray.refresh_token;
+          acessToken = dados.dadosApp.tray.access_token;
           
           resolve();
         } catch {
@@ -123,53 +124,78 @@ async function refreshToken(){
 
 async function cadastrarProduto(){
     try {
-      axios.post('{{api_address}}/products?access_token={{access_token}}', {
-        'Product[ean]': '98799979789879',
-        'Product[name]': 'Produto Teste API',
-        'Product[description]': 'Descrição do Produto de Teste da API',
-        'Product[description_small]': 'Produto de Teste da API',
-        'Product[price]': '10.01',
-        'Product[cost_price]': '10.01',
-        'Product[promotional_price]': '10.01',
-        'Product[start_promotion]': '2019-04-01',
-        'Product[end_promotion]': '2019-04-30',
-        'Product[brand]': 'Marca',
-        'Product[model]': 'Modelo',
-        'Product[weight]': '1000',
-        'Product[length]': '10',
-        'Product[width]': '10',
-        'Product[height]': '10',
-        'Product[stock]': '100',
-        'Product[category_id]': '2',
-        'Product[available]': '1',
-        'Product[availability]': 'Disponível em 3 dias',
-        'Product[availability_days]': '3',
-        'Product[reference]': '111',
-        'Product[hot]': '1',
-        'Product[release]': '1',
-        'Product[additional_button]': '0',
-        'Product[related_categories]': '[3,5,7]',
-        'Product[release_date]': '""',
-        'Product[shortcut]': '""',
-        'Product[virtual_product]': '0'
-      }, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
+      await leituraDosDados();
+
+      axios.post(`${url}/products?access_token=APP_ID-5005-STORE_ID-391250-61ac44f87f7ca2426f9943b7082ef7e74925fe45b193f14b12f391606cc9760e`, {
+          "Product": {
+            "ean": "98799979789879",
+            "name": "Produto Teste API NOVO",
+            "description": "Descrição do Produto de Teste da API",
+            "description_small": "Produto de Teste da API",
+            "price": "10.01",
+            "cost_price": "10.01",
+            "promotional_price": "10.01",
+            "start_promotion": "2019-04-01",
+            "end_promotion": "2019-04-30",
+            "brand": "Marca",
+            "model": "Modelo",
+            "weight": "1000",
+            "length": "10",
+            "width": "10",
+            "height": "10",
+            "stock": "100",
+            "category_id": "888964791",
+            "available": "1",
+            "availability": "Disponível em 3 dias",
+            "availability_days": "3",
+            "reference": "111",
+            "hot": "1",
+            "release": "1",
+            "additional_button": "0",
+            "related_categories": "[3,5,7]",
+            "release_date": "",
+            "shortcut": "",
+            "virtual_product": "0"
+          }
       })
-      .then(response => {
+      .then(function (response) {
         console.log(response.data);
       })
-      .catch(error => {
-        console.log('Unexpected HTTP status: ' + error.response.status + ' ' + error.response.statusText);
+      .catch(function (error) {
+        console.log(error);
       });
+      
     }
     catch(error){
       console.err(error);
     }
 }
 
+
+async function atualizarProduto(){
+  try {
+    await leituraDosDados();
+    let id = 1356613263;
+    axios.put(`${url}/products/${id}?access_token=${acessToken}`, {
+      "Product":{
+        "price": 4.5
+      }
+    })
+    .then(response => {
+      console.log('Resposta da API:', response.data);
+    })
+    .catch(error => {
+      console.error('Erro ao fazer requisição:', error);
+    });
+  }
+  catch(error){
+    console.err(error);
+  }
+}
+
 module.exports = {
     createToken,
-    refreshToken
+    refreshToken,
+    cadastrarProduto,
+    atualizarProduto
 };
