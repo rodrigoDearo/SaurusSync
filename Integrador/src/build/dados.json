@@ -5,7 +5,7 @@
       "dominio": "testesdrsistema"
     },
     "geral": {
-      "timer": "20:00"
+      "timer": "15:00"
     },
     "tray": {
       "consumer_key": "9f52214d3ff8cf0629d1fcfa3bd6a5b5e4fbc21a62305a7d6b450dc64a90cf68",
