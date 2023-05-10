@@ -4,7 +4,7 @@ const { retornaCampo } = require('./manipulacaoJSON');
 const axios = require('axios');
 const xml2js = require('xml2js');
 
-var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync, DateTime;
+var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync, DateTime, minutos, segundos;
 
 /**
  *  Função para retornar a data a ser enviado para requisição continua Saurus, atribuindo o horário da requisição baseada no tiemr da configuração geral
@@ -51,6 +51,19 @@ async function getChaveCaixa() {
   }
 }
 
+/**
+ * 
+ */
+async function getTimerJSON(){
+  try {
+    let timerRetorno = await retornaCampo('timer');
+    let timerValor = timerRetorno.toString();
+    minutos = parseInt(timerValor.substring(0, 2));
+    segundos = parseInt(timerValor.substring(3, 5));
+  } catch (err) {
+    console.error('Erro ao pegar timer JSON', err);
+  }
+}
 
 /**
  * Função para estrutura data e horário no padrão solicitado
@@ -181,6 +194,8 @@ function sincronizacaoContinua(data){
     getData(data);
     reqCadastros('1');
     console.log(DateTime);
+    let timerA = ((minutos*60)+segundos)*1000;
+    console.log(timerA+'ms');
     setInterval(function() {
       setDate();
       console.log(DateTime);
