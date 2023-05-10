@@ -5,16 +5,16 @@ const axios = require('axios');
 const xml2js = require('xml2js');
 
 var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync, DateTime;
-// ...resto do código...
+
+/**
+ *  Função para retornar a data a ser enviado para requisição continua Saurus, atribuindo o horário da requisição baseada no tiemr da configuração geral
+ * @returns {Datetime}  data no formato ISO8601 para ser enviada no corpo da requisição de cadastro Saurus
+ */
 function setDate(){
-  console.log('cheguei aqui')
   let data = new Date();  // FUNÇÃO PADRÃO NDOE PARA PUXAR DATA;
-<<<<<<< HEAD
   data.setHours(data.getHours() - 3);
   data.setMinutes(data.getMinutes() - minutos);
   data.setSeconds(data.getSeconds() - segundos); 
-=======
->>>>>>> sincronizacao-continua
   let dataISO8601 = data.toISOString(); // TRANSFORMA NO PADRÃO DE DATA ISO8601
   data = dataISO8601.slice(0, -5);  //RETIRA OS 5DÍTIGOT SINAIS PARA DEIXAR NO PADRÃO SOLICITADO
   data += '-03:0'; //ADICIONA FUSO HORÁRIO DE BRASILIA
@@ -23,6 +23,10 @@ function setDate(){
   return DateTime;
 }
 
+/**
+ * Define a senha para ser enviada na requisição para consumir WebService Saurus
+ * @returns {senha} no padrão consultado com desenvolvdedores do software
+ */
 function setSenha(){
   let dataAtual = new Date();
   let dia = dataAtual.getDate();
@@ -34,7 +38,10 @@ function setSenha(){
   return senha;
 }
 
-// Função assíncrona para retornar a ChaveCaixa
+
+/**
+ * Fução assíncrona para atribuir valor da chaveCaixa com base no retorno da função retornarCampo
+ */
 async function getChaveCaixa() {
   try {
     let chaveRetorno = await retornaCampo('chave');
@@ -44,13 +51,22 @@ async function getChaveCaixa() {
   }
 }
 
+
+/**
+ * Função para estrutura data e horário no padrão solicitado
+ * @param {*} data data informada no input como base para requisição 
+ * @returns {DateTime} a mesma data recebida como parametro porém estruturada no formado solicitado para consumo do WebService (adição do fuso hórario)
+ */
 function getData(data){
     DateTime = data + ':00-03:0';
     console.log(DateTime);
     return DateTime;
 }
 
-// Função assíncrona para retornar o Dominio
+
+/**
+ * Fução assíncrona para atribuir valor do Dominio com base no retorno da função retornarCampo
+ */
 async function getDominio() {
   try {
     let dominioRetorno = await retornaCampo('dominio');
@@ -60,7 +76,9 @@ async function getDominio() {
   }
 }
 
-// Função assíncrona para codificar o xmlReqCadastro
+/**
+ * Fução assíncrona para codificar a string do xml a ser enviado para requisição, em formato 64x bytes (padrão solicitado para ser enviado o xBytes)
+ */
 async function codificarXmlReqCadastro() {
   try {
     xBytesParametros = codificarInBase64(`<xmlIntegracao>
@@ -74,8 +92,11 @@ async function codificarXmlReqCadastro() {
     console.error('Erro ao codificar xmlReqCadastro:', err);
   }
 }
-console.log(xBytesParametros);
-// Função assíncrona para codificar a senha
+
+
+/**
+ * Função para codificar a senha en base 64 para ser enviada no corpo da requisição e consumo do WebService
+ */
 async function codificarSenha(){
   try{
     Password = codificarInBase64(setSenha());
@@ -85,7 +106,11 @@ async function codificarSenha(){
   }
 }
 
-// Função para realizar a requisição post dos cadastros
+
+/**
+ * Função que realiza a requisção POST para o WebSevice reqCadastros através da biblioteca Axios
+ * @param {*} Sync paramêtro informado para realização da requisição (explicação dos valores passados a Sync são explicados na documentação)
+ */
 function reqCadastros(Sync) {
   getChaveCaixa()
     .then(() => {
@@ -109,11 +134,7 @@ function reqCadastros(Sync) {
           </retCadastros>
         </soap:Body>
       </soap:Envelope>`
-<<<<<<< HEAD
 
-=======
-      console.log(body);
->>>>>>> sincronizacao-continua
       axios.post('https://wscadastros.saurus.net.br/v001/serviceCadastros.asmx', body, { headers })
         .then((response) => {
           console.log(response.data);
@@ -140,6 +161,10 @@ function reqCadastros(Sync) {
 }
 
 
+/**
+ * 
+ * @param {*} data 
+ */
 function sincronizacaoUnica(data){
   console.log('Cheguei');
     getData(data);
