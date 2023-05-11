@@ -160,6 +160,7 @@ function reqCadastros(Sync) {
               } else{
                 let retCadastrosResult = result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult[0];
                 decodificarEsalvar(retCadastrosResult);
+                
               }
             }
           });
@@ -183,6 +184,7 @@ function sincronizacaoUnica(data){
     reqCadastros('1');
 }
 
+
 /**
  * Função para definir horário a ser usado na requisição e chamar função para realizar o consumo da API
  * @param {*} data parametro referente ao horário a ser usado na requisição
@@ -192,12 +194,8 @@ function sincronizacaoContinua(data){
   .then(() => {
     getData(data);
     reqCadastros('1');
-    console.log(DateTime);
-    let timerA = ((minutos*60)+segundos)*1000;
-    console.log(timerA+'ms');
     setInterval(function() {
       setDate();
-      console.log(DateTime);
       reqCadastros('1');
     }, ((minutos*60)+segundos)*1000);
   })

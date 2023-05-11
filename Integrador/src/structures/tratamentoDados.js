@@ -41,11 +41,13 @@ function criarEziparArquivoXml(){
   
   function decodificarEsalvar(data) {
     let gzipData = Buffer.from(data, 'base64'); // Converte de base64 para Buffer
+    console.log(gzipData)
     zlib.gunzip(gzipData, (err, result) => { // Descompacta os dados
       if (err) {
         console.error(err);
         return;
       }
+
       let now = moment().utc().format('YYYY-MM-DD');
       let fileName = `cadastros-${now}.xml`;
   

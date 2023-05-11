@@ -175,7 +175,7 @@ async function cadastrarProduto(){
 async function atualizarProduto(){
   try {
     await leituraDosDados();
-    let id = 1356613263;
+    let id = 1356613263;      //produto
     axios.put(`${url}/products/${id}?access_token=${acessToken}`, {
       "Product":{
         "price": 4.5
@@ -193,9 +193,28 @@ async function atualizarProduto(){
   }
 }
 
+
+async function deletarProduto(){
+  try {
+    await leituraDosDados();
+    let id = 1356613257;
+    axios.delete(`${url}/products/${id}?access_token=${acessToken}`)
+    .then(response => {
+      console.log('Resposta da API:', response.data);
+    })
+    .catch(error => {
+      console.error('Erro ao fazer requisição:', error);
+    });
+  }
+  catch(error){
+    console.err(error);
+  }
+}
+
 module.exports = {
     createToken,
     refreshToken,
     cadastrarProduto,
-    atualizarProduto
+    atualizarProduto,
+    deletarProduto
 };

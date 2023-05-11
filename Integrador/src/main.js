@@ -2,7 +2,7 @@
 const express = require('express');
 const { salvarDados, retornarDados } = require('./structures/manipulacaoJSON');
 const { sincronizacaoUnica, sincronizacaoContinua } = require('./structures/reqCadastros');
-const { createToken, refreshToken, cadastrarProduto, atualizarProduto } = require('./structures/configTray');
+const { createToken, refreshToken, cadastrarProduto, atualizarProduto, deletarProduto } = require('./structures/configTray');
 
 // AREA TESTE
 
@@ -107,7 +107,7 @@ app.on("activate", () => {
   }
 });
 
-atualizarProduto();
+
 
 /*
 TESTAR DELETE
