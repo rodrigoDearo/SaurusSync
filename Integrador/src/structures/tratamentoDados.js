@@ -3,6 +3,10 @@ const fs = require('fs');
 const stream = require('stream');
 const moment = require('moment');
 
+const { salvarDados } = require('./manipulacaoJSON');
+
+var fileName;
+
 // ---------------------- FUNÇÃO PARA CRIAR E ZIPAR DADOS  ---------------------- //
 /**
  * Função para criar um arquivo XML e retorná-lo compactado
@@ -39,21 +43,20 @@ function criarEziparArquivoXml(){
   // ---------------------- FUNÇÃO PARA DEOCDIGICAR BASE 64 E EXTRAIR ZIP ---------------------- //
   
   
-  function decodificarEsalvar(data) {
+  async function decodificarEsalvar(data) {
     let gzipData = Buffer.from(data, 'base64'); // Converte de base64 para Buffer
-    console.log(gzipData)
-    zlib.gunzip(gzipData, (err, result) => { // Descompacta os dados
+    zlib.gunzip(gzipData, async (err, result) => { // Descompacta os dados
       if (err) {
         console.error(err);
         return;
       }
 
-      let now = moment().utc().format('YYYY-MM-DD');
-      let fileName = `cadastros-${now}.xml`;
-  
+      let now = moment().utc().subtract(3, 'hours').format('YYYY-MM-DD HH-mm');
+      fileName = `cadastros-${now}.xml`;
+      await salvarDados(fileName, null, null, 'geral_file');
       const readStream = stream.Readable.from(result); // Cria um stream de leitura a partir dos dados descompactados
-  
-      readStream.pipe(fs.createWriteStream(`../GravacaoXML/${fileName}`)) // Grava os dados em um arquivo
+      console.log('Aqui sakvar > ' + fileName);
+       readStream.pipe(fs.createWriteStream(`../GravacaoXML/${fileName}`)) // Grava os dados em um arquivo
         .on('error', function(err) {
           console.error(err);
         })
@@ -63,11 +66,10 @@ function criarEziparArquivoXml(){
     });
   }
 
-
   module.exports = {
     decodificarEsalvar,
     codificarInBase64,
-    criarEziparArquivoXml
+    criarEziparArquivoXml, 
   };
   
   

@@ -1,21 +1,22 @@
 {
-    "dadosApp": {
-        "saurus": {
-            "chave": "0F38F081-6B77-4464-8C7E-FC686FB5B57B",
-            "dominio": "testesdrsistema"
-        },
-        "geral": {
-            "timer": "15:00"
-        },
-        "tray": {
-            "consumer_key": "9f52214d3ff8cf0629d1fcfa3bd6a5b5e4fbc21a62305a7d6b450dc64a90cf68",
-            "consumer_secret": "68e7ba3319a5b96eece177867a3c6212e7ec930c0ac89b719e1adcaaa6bc380f",
-            "code": "dca5f05b40953367511bafc9cf7cc1f54a69ba6179b1078b55626d4323b6dbe1",
-            "access_token": "APP_ID-5005-STORE_ID-391250-0a65483a0b1d0f8c916dcd4c9bedfe52196b5caa8861bf9229cf6d97685ebff4",
-            "refresh_token": "baf2a84fcdd9f594a24bd23f5993fea95491145b11973fe5b19be3f426ffde39",
-            "date_expiration_access_token": "2023-05-11 11:43:18",
-            "date_expiration_refresh_token": "2023-06-10 08:43:18",
-            "url": "https://391250.commercesuite.com.br/web_api"
-        }
+  "dadosApp": {
+    "saurus": {
+      "chave": "0F38F081-6B77-4464-8C7E-FC686FB5B57B",
+      "dominio": "testesdrsistema"
+    },
+    "geral": {
+      "timer": "15:00",
+      "ultimo_file": "cadastros-2023-05-13 17-51.xml"
+    },
+    "tray": {
+      "consumer_key": "9f52214d3ff8cf0629d1fcfa3bd6a5b5e4fbc21a62305a7d6b450dc64a90cf68",
+      "consumer_secret": "68e7ba3319a5b96eece177867a3c6212e7ec930c0ac89b719e1adcaaa6bc380f",
+      "code": "dca5f05b40953367511bafc9cf7cc1f54a69ba6179b1078b55626d4323b6dbe1",
+      "access_token": "APP_ID-5005-STORE_ID-391250-aef47c73033becb61d9ee4be026a3ddcce9a209fe45b71eed0978638b2a62541",
+      "refresh_token": "c2f62b20f7891ce53d4e9ac5a3d42a4685669647e38ebe1b7e3c34983b661859",
+      "date_expiration_access_token": "2023-05-13 18:49:05",
+      "date_expiration_refresh_token": "2023-06-12 15:49:05",
+      "url": "https://391250.commercesuite.com.br/web_api"
     }
+  }
 }

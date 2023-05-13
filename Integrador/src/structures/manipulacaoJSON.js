@@ -6,7 +6,7 @@ const fs = require('fs');
  * @param {*} campo2 Caso não nuulo, é outra informalção para ser cadastrada
  * @param {string} systemSave Informa qual tabela do arquivo JSOn pertence a informação
  */
-function salvarDados(campo1, campo2, campo3, systemSave){
+async function salvarDados(campo1, campo2, campo3, systemSave){
   fs.readFile('./src/build/dados.json', 'utf-8', (err, data) => {
     if (err) {
       console.error(err);
@@ -31,6 +31,11 @@ function salvarDados(campo1, campo2, campo3, systemSave){
         dadosApp.dadosApp.tray.consumer_secret = campo2;
         dadosApp.dadosApp.tray.code = campo3;
         break;
+
+      case 'geral_file':
+        dadosApp.dadosApp.geral.ultimo_file  = campo1;
+        break;
+
     }
   
       let novoJson = JSON.stringify(dadosApp, null, 2);
@@ -79,7 +84,7 @@ function retornarDados() {
  * @param {*} campo parametro referente a qual campo se requisita
  * @returns {dadosRetorno} retorna o dado lido na gravação JSON
  */
-function retornaCampo(campo){
+async function retornaCampo(campo){
   return new Promise((resolve, reject) => {
     fs.readFile('./src/build/dados.json', 'utf-8', (err, data) => {
       if (err) {
@@ -98,6 +103,18 @@ function retornaCampo(campo){
           case 'timer':
             var dadosRetorno = dados.dadosApp.geral.timer;
             break;
+
+          case 'nameFile':
+            var dadosRetorno = dados.dadosApp.geral.ultimo_file;
+            break
+
+          case 'expira_acessToken':
+            var dadosRetorno = dados.dadosApp.tray.date_expiration_access_token;
+            break
+
+          case 'expira_refreshToken':
+            var dadosRetorno = dados.dadosApp.tray.date_expiration_refresh_token;
+            break
           
         }
         resolve(dadosRetorno);

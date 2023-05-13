@@ -4,14 +4,10 @@ const { salvarDados, retornarDados } = require('./structures/manipulacaoJSON');
 const { sincronizacaoUnica, sincronizacaoContinua } = require('./structures/reqCadastros');
 const { createToken, refreshToken, cadastrarProduto, atualizarProduto, deletarProduto } = require('./structures/configTray');
 
-// AREA TESTE
 
-
-// ADICAO DE COMENT
 
 
 // EXECUTAR FUNÇÕES 
-
 
 
 // ---------------------- EXPRESS JS ---------------------- //
@@ -106,6 +102,7 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
 
 
 

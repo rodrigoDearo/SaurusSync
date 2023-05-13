@@ -2,7 +2,7 @@
 const axios = require('axios');
 const fs = require('fs');
 
-var consumerSecret, consumerKey, code, url, tokenRefresh, acessToken;
+var consumerSecret, consumerKey, code, url, tokenRefresh, acessToken, produto;
 
 
 /**
@@ -122,49 +122,61 @@ async function refreshToken(){
 }
 
 
-async function cadastrarProduto(){
-    try {
-      await leituraDosDados();
+async function definirProduto(nome, preco, estoque, precoCompra, marca){
+  try{
+    produto = {
+        "Product": {
+        "ean": "",
+        "name": `${nome}`,
+        "description": "",
+        "description_small": "",
+        "price": `${preco}`,
+        "cost_price": `${precoCompra}`,
+        "promotional_price": "",
+        "start_promotion": "",
+        "end_promotion": "",
+        "brand": `${marca}`,
+        "model": "",
+        "weight": "1",
+        "length": "",
+        "width": "",
+        "height": "",
+        "stock": `${estoque}`,
+        "category_id": "",
+        "available": "",
+        "availability": "",
+        "availability_days": "",
+        "reference": "",
+        "hot": "",
+        "release": "",
+        "additional_button": "",
+        "related_categories": "",
+        "release_date": "",
+        "shortcut": "",
+        "virtual_product": ""
+      }
+    }
+  }
+  catch(error){
+    console.err(error);
+  }
+}
 
-      axios.post(`${url}/products?access_token=APP_ID-5005-STORE_ID-391250-61ac44f87f7ca2426f9943b7082ef7e74925fe45b193f14b12f391606cc9760e`, {
-          "Product": {
-            "ean": "98799979789879",
-            "name": "Produto Teste API NOVO",
-            "description": "Descrição do Produto de Teste da API",
-            "description_small": "Produto de Teste da API",
-            "price": "10.01",
-            "cost_price": "10.01",
-            "promotional_price": "10.01",
-            "start_promotion": "2019-04-01",
-            "end_promotion": "2019-04-30",
-            "brand": "Marca",
-            "model": "Modelo",
-            "weight": "1000",
-            "length": "10",
-            "width": "10",
-            "height": "10",
-            "stock": "100",
-            "category_id": "888964791",
-            "available": "1",
-            "availability": "Disponível em 3 dias",
-            "availability_days": "3",
-            "reference": "111",
-            "hot": "1",
-            "release": "1",
-            "additional_button": "0",
-            "related_categories": "[3,5,7]",
-            "release_date": "",
-            "shortcut": "",
-            "virtual_product": "0"
-          }
-      })
-      .then(function (response) {
+
+async function cadastrarProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thismarca){
+    try {
+      await leituraDosDados()
+      .then(await definirProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thismarca))
+      .then(() => {
+        axios.post(`${url}/products?access_token=APP_ID-5005-STORE_ID-391250-61ac44f87f7ca2426f9943b7082ef7e74925fe45b193f14b12f391606cc9760e`, produto)
+        .then(function (response) {
         console.log(response.data);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
       })
-      .catch(function (error) {
-        console.log(error);
-      });
-      
+    
     }
     catch(error){
       console.err(error);

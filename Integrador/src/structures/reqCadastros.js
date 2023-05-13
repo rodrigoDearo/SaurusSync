@@ -1,8 +1,12 @@
 /* ---------------------- IMPORTAÇÃO DE MÓDULOS ----------------------*/
-const { codificarInBase64, decodificarEsalvar } = require('./tratamentoDados');
+const { codificarInBase64, decodificarEsalvar} = require('./tratamentoDados');
 const { retornaCampo } = require('./manipulacaoJSON');
+const { createToken, refreshToken, cadastrarProduto, atualizarProduto, deletarProduto } = require('./configTray');
 const axios = require('axios');
 const xml2js = require('xml2js');
+const fs = require('fs');
+const { DOMParser } = require('xmldom');
+
 
 var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync, DateTime, minutos, segundos;
 
@@ -89,6 +93,7 @@ async function getDominio() {
   }
 }
 
+
 /**
  * Fução assíncrona para codificar a string do xml a ser enviado para requisição, em formato 64x bytes (padrão solicitado para ser enviado o xBytes)
  */
@@ -150,8 +155,7 @@ function reqCadastros(Sync) {
 
       axios.post('https://wscadastros.saurus.net.br/v001/serviceCadastros.asmx', body, { headers })
         .then((response) => {
-          console.log(response.data);
-          xml2js.parseString(response.data, (err, result) => {
+          xml2js.parseString(response.data, async (err, result) => {
             if (err) {
               console.error(err);
             } else {
@@ -159,8 +163,31 @@ function reqCadastros(Sync) {
                 console.log('Sem mudancas a serem carregadas');
               } else{
                 let retCadastrosResult = result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult[0];
-                decodificarEsalvar(retCadastrosResult);
+                await decodificarEsalvar(retCadastrosResult)
                 
+                let data_expiraAcess = await retornaCampo('expira_acessToken');
+                let data_expiraRefresh = await retornaCampo('expira_refreshToken');
+
+                let dataAcess = new Date(data_expiraAcess);
+                let dataRefresh = new Date(data_expiraRefresh);
+
+                let dataAtual = new Date();
+
+                if (dataAcess < dataAtual) {
+                  if(dataRefresh < dataAtual){
+                    console.log('createToken');
+                    createToken();
+                  }
+                  else{
+                    console.log('refreshToken');
+                    refreshToken()
+                  }
+                } 
+                else{
+                  console.log('desnecessario refreshs');
+                }
+
+                lerDados();
               }
             }
           });
@@ -175,6 +202,24 @@ function reqCadastros(Sync) {
 }
 
 
+async function lerDados(){
+   try {
+    let name = await retornaCampo('nameFile');
+    let xmlString = fs.readFileSync(`../GravacaoXML/${name}`, 'utf8');
+    console.log('lido >' + name);
+    let parser = new DOMParser();
+    let xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+
+    let tbProdutosDados = xmlDoc.getElementsByTagName('tbProdutoDados')[0];
+    let rows = tbProdutosDados.getElementsByTagName('row');
+    console.log(rows.length);
+  } catch (err) {
+    console.error(err);
+  }
+
+}
+
+
 /**
  * Função para definir horário a ser usado na requisição e chamar função para realizar o consumo da API
  * @param {*} data parametro referente ao horário a ser usado na requisição
@@ -182,6 +227,7 @@ function reqCadastros(Sync) {
 function sincronizacaoUnica(data){
     getData(data);
     reqCadastros('1');
+    
 }
 
 
@@ -194,12 +240,16 @@ function sincronizacaoContinua(data){
   .then(() => {
     getData(data);
     reqCadastros('1');
+    //
     setInterval(function() {
       setDate();
       reqCadastros('1');
+      //
     }, ((minutos*60)+segundos)*1000);
   })
 }
+
+
 
 module.exports = {
   setDate, 
