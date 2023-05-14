@@ -1,5 +1,5 @@
 /* ---------------------- IMPORTAÇÃO DE MÓDULOS ----------------------*/
-const { codificarInBase64, decodificarEsalvar} = require('./tratamentoDados');
+const { codificarInBase64, decodificarEsalvar, decodificarEsalvarEstoque } = require('./tratamentoDados');
 const { retornaCampo } = require('./manipulacaoJSON');
 const { createToken, refreshToken, cadastrarProduto, atualizarProduto, deletarProduto } = require('./configTray');
 const axios = require('axios');
@@ -112,6 +112,21 @@ async function codificarXmlReqCadastro() {
 }
 
 
+async function codificarXmlRetProdutoEstoque(idParametro){
+  try {
+    let idProdutoColsulta = idParametro;
+    xBytesParametros = codificarInBase64(`<xmlIntegracao>
+    <Dominio>${Dominio}</Dominio>
+    <IdProduto>${idProdutoColsulta}</IdProduto>
+    <CodProduto/>
+  </xmlIntegracao>`);
+  }
+  catch(err){
+    console.err('Erro ao codificar xmlRetProdutoEstoque:', err)
+  }
+}
+
+
 /**
  * Função para codificar a senha en base 64 para ser enviada no corpo da requisição e consumo do WebService
  */
@@ -132,7 +147,7 @@ async function codificarSenha(){
 function reqCadastros(Sync) {
   getChaveCaixa()
     .then(() => {
-      TpSync = Sync
+      TpSync = Sync;
     })
     .then(() => getDominio())
     .then(() => codificarSenha())
@@ -163,7 +178,7 @@ function reqCadastros(Sync) {
                 console.log('Sem mudancas a serem carregadas');
               } else{
                 let retCadastrosResult = result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult[0];
-                processarDados(retCadastrosResult);
+                autorizarAcesso(retCadastrosResult);
               }
             }
           });
@@ -178,23 +193,153 @@ function reqCadastros(Sync) {
 }
 
 
-async function lerDados(){
+
+async function retProdutoEstoque(id) {
+    getDominio()
+    .then(() => codificarSenha())
+    .then(() => codificarXmlRetProdutoEstoque(id))
+    .then(() => {
+      const headers = {
+        'Host': 'wsretaguarda.saurus.net.br',
+        'Content-Type': 'text/xml; charset=utf-8',
+        'SOAPAction': 'http://saurus.net.br/retProdutoEstoque'
+      }
+
+      const body = `<?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+          <retProdutoEstoque xmlns="http://saurus.net.br/">
+            <xBytesParametros>${xBytesParametros}</xBytesParametros>
+            <xSenha>${Password}</xSenha>
+          </retProdutoEstoque>
+        </soap:Body>
+      </soap:Envelope>`
+      axios.post('http://wsretaguarda.saurus.net.br/v001/serviceRetaguarda.asmx', body, { headers })
+        .then((response) => {
+          xml2js.parseString(response.data, async (err, result) => {
+            if (err) {
+              console.error(err);
+            } else {
+              if ((result['soap:Envelope']['soap:Body'][0].retProdutoEstoqueResponse[0].xRetNumero) == 1){
+                console.log('Erro na requisição');
+              } else if((result['soap:Envelope']['soap:Body'][0].retProdutoEstoqueResponse[0].xRetNumero) == 0){
+                let retProdutoEstoqueResult = result['soap:Envelope']['soap:Body'][0].retProdutoEstoqueResponse[0].retProdutoEstoqueResult[0];
+                await decodificarEsalvarEstoque(retProdutoEstoqueResult, id);
+              }
+            }
+          });
+        })
+        .catch((error) => {
+          console.error('Erro na requisição:', error);
+        });
+    })
+    .catch((error) => {
+      console.error('Erro ao obter dados:', error);
+    });
+}
+
+
+async function getPrecoFromXml(xmlString, id) {
+  return new Promise((resolve, reject) => {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+
+    const table = xmlDoc.getElementsByTagName('tbProdutoPrecos')[0];
+    let rowNodes = table.getElementsByTagName('row');
+
+    let preco;
+    for (let i = 0; i < rowNodes.length; i++) {
+      const rowNode = rowNodes[i];
+      if (rowNode.getAttribute('pro_idProduto') == id) {
+        preco = rowNode.getAttribute('pro_vPreco');
+        break;
+      }
+    }
+    if (preco !== null) {
+      resolve(preco);
+    } else {
+      reject(new Error('Could not find preco for pro_idProduto="10"'));
+    }
+  });
+}
+
+
+async function getEstoqueXml(id) {
+  return new Promise((resolve, reject) => {
+    const parser = new DOMParser();
+    let xmlString = fs.readFileSync(`../GravacaoXMLprodutoEstoque/cadastros-${id}.xml`, 'utf8');
+    const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+
+    const estoqueLojas = xmlDoc.getElementsByTagName('EstoqueLoja');
+
+    let saldoTotal = 0;
+    for (let i = 0; i < estoqueLojas.length; i++) {
+      const qSaldo = parseFloat(estoqueLojas[i].getAttribute('qSaldo'));
+      saldoTotal += qSaldo;
+    }
+    if(saldoTotal==undefined){
+      console.log('saldo zerado');
+      saldoTotal = 0;
+    }
+    resolve(parseInt(saldoTotal));
+  });
+}
+
+
+async function wsCadastro(){
    try {
     let name = await retornaCampo('nameFile'); 
     let xmlString = fs.readFileSync(`../GravacaoXML/${name}`, 'utf8');
 
     let parser = new DOMParser();
     let xmlDoc = parser.parseFromString(xmlString, 'text/xml');
-
     let table = xmlDoc.getElementsByTagName('tbProdutoDados')[0];
     let rows = table.getElementsByTagName('row');
 
-    console.log(`Quantidade de registros: ${rows.length}`);
-
     for (let i = 0; i < rows.length; i++) {
-      let descProduto = rows[i].getAttribute('pro_descProduto');
+
       let idProduto = rows[i].getAttribute('pro_idProduto');
-      console.log(`Produto ${i + 1}: ${idProduto} - ${descProduto}`);
+      let exclusaoProduto = rows[i].getAttribute('pro_indStatus');
+
+      
+      let descProduto = rows[i].getAttribute('pro_descProduto');
+      let provPreco = parseFloat(await getPrecoFromXml(xmlString, idProduto));
+      let precoProduto = provPreco.toFixed(2);
+      let custoProduto = rows[i].getAttribute('pro_vCompra');
+      let marcaProduto = rows[i].getAttributeNS('pro_descMarca');
+      let estoqueProduto;
+
+      await retProdutoEstoque(idProduto);
+      await getEstoqueXml(idProduto).then((saldoTotal) => {
+          estoqueProduto = saldoTotal;
+      }).catch((err) => {
+        console.error(err);
+      });
+      
+      const dados = JSON.parse(fs.readFileSync('./src/build/produtos.json', 'utf8'));
+      if (dados.produtos[idProduto]) {
+          if(exclusaoProduto=="1"){
+            let idTray = dados.produtos[idProduto];
+            await deletarProduto(idTray)
+            .then(() => {
+              delete dados.produtos[idProduto];
+            })
+            .catch((_) => { console.err(_)})
+          }
+          else if(exclusaoProduto=="0"){                       
+            let idTray = dados.produtos[idProduto];
+            await atualizarProduto(descProduto, precoProduto, estoqueProduto, custoProduto, marcaProduto, idTray);
+          }
+      } else {
+          if(exclusaoProduto=="1"){
+            break;
+          }
+          else if(exclusaoProduto=="0"){
+            dados.produtos[idProduto] = i;
+            await cadastrarProduto(descProduto, precoProduto, estoqueProduto, custoProduto, marcaProduto);
+          }
+      }
+      fs.writeFileSync('./src/build/produtos.json', JSON.stringify(dados));
     }
 
   } catch (err) {
@@ -204,7 +349,7 @@ async function lerDados(){
 }
 
 
-async function processarDados(retCadastrosResult) {
+async function autorizarAcesso(retCadastrosResult) {
   await decodificarEsalvar(retCadastrosResult);
   
   let data_expiraAcess = await retornaCampo('expira_acessToken');
@@ -217,19 +362,14 @@ async function processarDados(retCadastrosResult) {
 
   if (dataAcess < dataAtual) {
     if(dataRefresh < dataAtual){
-      console.log('createToken');
       createToken();
     }
     else{
-      console.log('refreshToken');
       refreshToken()
     }
   } 
-  else{
-    console.log('desnecessario refreshs');
-  }
 
-  lerDados();
+  wsCadastro();
 }
 
 
@@ -239,8 +379,7 @@ async function processarDados(retCadastrosResult) {
  */
 function sincronizacaoUnica(data){
     getData(data);
-    reqCadastros('1');
-    
+    reqCadastros(1);
 }
 
 
@@ -252,11 +391,11 @@ function sincronizacaoContinua(data){
   getTimerJSON()
   .then(() => {
     getData(data);
-    reqCadastros('1');
+    reqCadastros(1);
     //
     setInterval(function() {
       setDate();
-      reqCadastros('1');
+      reqCadastros(2);
       //
     }, ((minutos*60)+segundos)*1000);
   })

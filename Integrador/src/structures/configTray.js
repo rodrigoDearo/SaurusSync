@@ -142,7 +142,7 @@ async function definirProduto(nome, preco, estoque, precoCompra, marca){
         "width": "",
         "height": "",
         "stock": `${estoque}`,
-        "category_id": "",
+        "category_id": "888967433",
         "available": "",
         "availability": "",
         "availability_days": "",
@@ -168,12 +168,15 @@ async function cadastrarProduto(thisnome, thispreco, thisestoque, thisprecoCompr
       await leituraDosDados()
       .then(await definirProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thismarca))
       .then(() => {
-        axios.post(`${url}/products?access_token=APP_ID-5005-STORE_ID-391250-61ac44f87f7ca2426f9943b7082ef7e74925fe45b193f14b12f391606cc9760e`, produto)
+        axios.post(`${url}/products?access_token=${acessToken}`, produto)
         .then(function (response) {
-        console.log(response.data);
+          //console.log(response.data.id)
+          console.log('Deu certo:' + thisnome);
+          console.log(produto);
         })
         .catch(function (error) {
-          console.log(error);
+          console.log('Deu bosta:' + thisnome);
+          console.log(produto);
         });
       })
     
@@ -184,21 +187,21 @@ async function cadastrarProduto(thisnome, thispreco, thisestoque, thisprecoCompr
 }
 
 
-async function atualizarProduto(){
+async function atualizarProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thismarca, thisid){
   try {
-    await leituraDosDados();
-    let id = 1356613263;      //produto
-    axios.put(`${url}/products/${id}?access_token=${acessToken}`, {
-      "Product":{
-        "price": 4.5
-      }
+    let id;
+    await leituraDosDados()
+    .then(() => {id = thisid;})
+    .then(await definirProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thismarca))
+    .then(() => {
+      axios.put(`${url}/products/${id}?access_token=${acessToken}`, produto)
+      .then(response => {
+        console.log('Resposta da API:', response.data);
+      })
+      .catch(error => {
+        console.error('Erro ao fazer requisição:', error);
+      });
     })
-    .then(response => {
-      console.log('Resposta da API:', response.data);
-    })
-    .catch(error => {
-      console.error('Erro ao fazer requisição:', error);
-    });
   }
   catch(error){
     console.err(error);
@@ -206,17 +209,20 @@ async function atualizarProduto(){
 }
 
 
-async function deletarProduto(){
+async function deletarProduto(thisid){
   try {
-    await leituraDosDados();
-    let id = 1356613257;
-    axios.delete(`${url}/products/${id}?access_token=${acessToken}`)
-    .then(response => {
-      console.log('Resposta da API:', response.data);
+    let id;
+    await leituraDosDados()
+    .then((thisid) => {id = thisid})
+    .then(() => {
+      axios.delete(`${url}/products/${id}?access_token=${acessToken}`)
+      .then(response => {
+        console.log('Resposta da API:', response.data);
+      })
+      .catch(error => {
+        console.error('Erro ao fazer requisição:', error);
+      });
     })
-    .catch(error => {
-      console.error('Erro ao fazer requisição:', error);
-    });
   }
   catch(error){
     console.err(error);

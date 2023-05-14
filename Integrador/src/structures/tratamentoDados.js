@@ -55,7 +55,6 @@ function criarEziparArquivoXml(){
         fileName = `cadastros-${now}.xml`;
         await salvarDados(fileName, null, null, 'geral_file');
         const readStream = stream.Readable.from(result); // Cria um stream de leitura a partir dos dados descompactados
-        console.log('Aqui sakvar > ' + fileName);
         readStream.pipe(fs.createWriteStream(`../GravacaoXML/${fileName}`)) // Grava os dados em um arquivo
           .on('error', function(err) {
             reject(err);
@@ -68,10 +67,37 @@ function criarEziparArquivoXml(){
     });
   }
 
+
+  async function decodificarEsalvarEstoque(data, id) {
+    return new Promise((resolve, reject) => {
+      let gzipData = Buffer.from(data, 'base64'); // Converte de base64 para Buffer
+      zlib.gunzip(gzipData, async (err, result) => { // Descompacta os dados
+        if (err) {
+          reject(err);
+        }
+
+        fileName = `cadastros-${id}.xml`;
+  
+        const readStream = stream.Readable.from(result); // Cria um stream de leitura a partir dos dados descompactados
+
+        readStream.pipe(fs.createWriteStream(`../GravacaoXMLprodutoEstoque/${fileName}`)) // Grava os dados em um arquivo
+          .on('error', function(err) {
+            reject(err);
+          })
+          .on('finish', function() {
+            console.log('Arquivo descompactado e gravado com sucesso!');
+            resolve();
+          });
+      });
+    });
+  }
+
+
   module.exports = {
     decodificarEsalvar,
     codificarInBase64,
     criarEziparArquivoXml, 
+    decodificarEsalvarEstoque
   };
   
   
