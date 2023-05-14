@@ -163,31 +163,7 @@ function reqCadastros(Sync) {
                 console.log('Sem mudancas a serem carregadas');
               } else{
                 let retCadastrosResult = result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult[0];
-                await decodificarEsalvar(retCadastrosResult)
-                
-                let data_expiraAcess = await retornaCampo('expira_acessToken');
-                let data_expiraRefresh = await retornaCampo('expira_refreshToken');
-
-                let dataAcess = new Date(data_expiraAcess);
-                let dataRefresh = new Date(data_expiraRefresh);
-
-                let dataAtual = new Date();
-
-                if (dataAcess < dataAtual) {
-                  if(dataRefresh < dataAtual){
-                    console.log('createToken');
-                    createToken();
-                  }
-                  else{
-                    console.log('refreshToken');
-                    refreshToken()
-                  }
-                } 
-                else{
-                  console.log('desnecessario refreshs');
-                }
-
-                lerDados();
+                processarDados(retCadastrosResult);
               }
             }
           });
@@ -204,19 +180,56 @@ function reqCadastros(Sync) {
 
 async function lerDados(){
    try {
-    let name = await retornaCampo('nameFile');
+    let name = await retornaCampo('nameFile'); 
     let xmlString = fs.readFileSync(`../GravacaoXML/${name}`, 'utf8');
-    console.log('lido >' + name);
+
     let parser = new DOMParser();
     let xmlDoc = parser.parseFromString(xmlString, 'text/xml');
 
-    let tbProdutosDados = xmlDoc.getElementsByTagName('tbProdutoDados')[0];
-    let rows = tbProdutosDados.getElementsByTagName('row');
-    console.log(rows.length);
+    let table = xmlDoc.getElementsByTagName('tbProdutoDados')[0];
+    let rows = table.getElementsByTagName('row');
+
+    console.log(`Quantidade de registros: ${rows.length}`);
+
+    for (let i = 0; i < rows.length; i++) {
+      let descProduto = rows[i].getAttribute('pro_descProduto');
+      let idProduto = rows[i].getAttribute('pro_idProduto');
+      console.log(`Produto ${i + 1}: ${idProduto} - ${descProduto}`);
+    }
+
   } catch (err) {
     console.error(err);
   }
 
+}
+
+
+async function processarDados(retCadastrosResult) {
+  await decodificarEsalvar(retCadastrosResult);
+  
+  let data_expiraAcess = await retornaCampo('expira_acessToken');
+  let data_expiraRefresh = await retornaCampo('expira_refreshToken');
+
+  let dataAcess = new Date(data_expiraAcess);
+  let dataRefresh = new Date(data_expiraRefresh);
+
+  let dataAtual = new Date();
+
+  if (dataAcess < dataAtual) {
+    if(dataRefresh < dataAtual){
+      console.log('createToken');
+      createToken();
+    }
+    else{
+      console.log('refreshToken');
+      refreshToken()
+    }
+  } 
+  else{
+    console.log('desnecessario refreshs');
+  }
+
+  lerDados();
 }
 
 

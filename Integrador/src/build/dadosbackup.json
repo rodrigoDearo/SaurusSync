@@ -4,6 +4,10 @@
       "chave": "",
       "dominio": ""
     },
+    "geral": {
+      "timer": "",
+      "ultimo_file": ""
+    },
     "tray": {
       "consumer_key": "",
       "consumer_secret": "",
@@ -13,10 +17,6 @@
       "date_expiration_access_token": "",
       "date_expiration_refresh_token": "",
       "url": ""
-    },
-    "configGeral": {
-      "timer": "",
-      "caminho": ""
     }
   }
 }
