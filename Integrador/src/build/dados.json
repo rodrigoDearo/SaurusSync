@@ -6,16 +6,16 @@
     },
     "geral": {
       "timer": "15:00",
-      "ultimo_file": "cadastros-2023-05-14 20-33.xml"
+      "ultimo_file": "cadastros-2023-05-15 09-46.xml"
     },
     "tray": {
       "consumer_key": "9f52214d3ff8cf0629d1fcfa3bd6a5b5e4fbc21a62305a7d6b450dc64a90cf68",
       "consumer_secret": "68e7ba3319a5b96eece177867a3c6212e7ec930c0ac89b719e1adcaaa6bc380f",
       "code": "dca5f05b40953367511bafc9cf7cc1f54a69ba6179b1078b55626d4323b6dbe1",
-      "access_token": "APP_ID-5005-STORE_ID-391250-222be198a7160be55fdab0738fc55e58924440fe439548c72a5bba1f55b394b8",
-      "refresh_token": "b6ffe49daf17827b1d9d07d2fb2226775cdb5de06c7466a4a519926c7646f48a",
-      "date_expiration_access_token": "2023-05-14 21:38:11",
-      "date_expiration_refresh_token": "2023-06-13 18:38:11",
+      "access_token": "APP_ID-5005-STORE_ID-391250-1fdf3ab5aeed69cfd0adb3c1f7319c7193e8cecb9164d6fd7ec17775640c00c7",
+      "refresh_token": "c2bfc244262cfc7bac3574a7836a39e63f3b68e82264e4249281a03c0275b469",
+      "date_expiration_access_token": "2023-05-15 12:26:17",
+      "date_expiration_refresh_token": "2023-06-14 09:26:17",
       "url": "https://391250.commercesuite.com.br/web_api"
     }
   }

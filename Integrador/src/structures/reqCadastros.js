@@ -290,14 +290,13 @@ async function wsCadastro(){
    try {
     let name = await retornaCampo('nameFile'); 
     let xmlString = fs.readFileSync(`../GravacaoXML/${name}`, 'utf8');
-
     let parser = new DOMParser();
     let xmlDoc = parser.parseFromString(xmlString, 'text/xml');
     let table = xmlDoc.getElementsByTagName('tbProdutoDados')[0];
     let rows = table.getElementsByTagName('row');
 
     for (let i = 0; i < rows.length; i++) {
-
+      
       let idProduto = rows[i].getAttribute('pro_idProduto');
       let exclusaoProduto = rows[i].getAttribute('pro_indStatus');
 
@@ -332,10 +331,10 @@ async function wsCadastro(){
           }
       } else {
           if(exclusaoProduto=="1"){
-            break;
+           
           }
           else if(exclusaoProduto=="0"){
-            dados.produtos[idProduto] = i;
+            dados.produtos[idProduto] = descProduto;
             await cadastrarProduto(descProduto, precoProduto, estoqueProduto, custoProduto, marcaProduto);
           }
       }

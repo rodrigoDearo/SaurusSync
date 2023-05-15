@@ -1,1 +1,16 @@
-{"produtos":{"10":0,"8137":1,"8138":2,"8139":3,"8141":4,"8142":5,"8143":6,"8144":7,"8145":8}}
+{
+    "produtos": {
+        "10": "TAXA ENTREGA",
+        "2041": "COXINHA DE FRANGO",
+        "8135": "Camisa",
+        "8136": "YAKISSOBA TRADICIONAL CARNE E FRANGO YKTD 87G",
+        "8137": "CAMISA SERGIO K",
+        "8138": "CAMISA SERGIO K ROSA TAMANHO M",
+        "8139": "CAMISA SERGIO K ROSA TAMANHO P",
+        "8141": "Bota",
+        "8142": "Bota Bota Feminina Coturno preto 35",
+        "8143": "Bota Bota Feminina Coturno preto 36",
+        "8144": "Bota Bota Feminina Coturno marrom 35",
+        "8145": "Bota Bota Feminina Coturno marrom 36"
+    }
+}

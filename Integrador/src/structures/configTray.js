@@ -171,8 +171,6 @@ async function cadastrarProduto(thisnome, thispreco, thisestoque, thisprecoCompr
         axios.post(`${url}/products?access_token=${acessToken}`, produto)
         .then(function (response) {
           //console.log(response.data.id)
-          console.log('Deu certo:' + thisnome);
-          console.log(produto);
         })
         .catch(function (error) {
           console.log('Deu bosta:' + thisnome);
@@ -211,7 +209,7 @@ async function atualizarProduto(thisnome, thispreco, thisestoque, thisprecoCompr
 
 async function deletarProduto(thisid){
   try {
-    let id;
+    let id = thisid;
     await leituraDosDados()
     .then((thisid) => {id = thisid})
     .then(() => {
