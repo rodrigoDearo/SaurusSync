@@ -1,6 +1,7 @@
 /* ---------------------- IMPORTAÇÃO DE MÓDULOS ----------------------*/
 const axios = require('axios');
 const fs = require('fs');
+const { resolve } = require('path');
 
 var consumerSecret, consumerKey, code, url, tokenRefresh, acessToken, produto;
 
@@ -122,110 +123,128 @@ async function refreshToken(){
 }
 
 
-async function definirProduto(nome, preco, estoque, precoCompra, marca){
-  try{
-    produto = {
-        "Product": {
-        "ean": "",
-        "name": `${nome}`,
-        "description": "",
-        "description_small": "",
-        "price": `${preco}`,
-        "cost_price": `${precoCompra}`,
-        "promotional_price": "",
-        "start_promotion": "",
-        "end_promotion": "",
-        "brand": `${marca}`,
-        "model": "",
-        "weight": "1",
-        "length": "",
-        "width": "",
-        "height": "",
-        "stock": `${estoque}`,
-        "category_id": "888967433",
-        "available": "",
-        "availability": "",
-        "availability_days": "",
-        "reference": "",
-        "hot": "",
-        "release": "",
-        "additional_button": "",
-        "related_categories": "",
-        "release_date": "",
-        "shortcut": "",
-        "virtual_product": ""
-      }
-    }
-  }
-  catch(error){
-    console.err(error);
-  }
-}
-
-
-async function cadastrarProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thismarca){
+async function definirProduto(nome, preco, estoque, precoCompra) {
+  return new Promise((resolve, reject) => {
     try {
-      await leituraDosDados()
-      .then(await definirProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thismarca))
-      .then(() => {
-        axios.post(`${url}/products?access_token=${acessToken}`, produto)
-        .then(function (response) {
-          //console.log(response.data.id)
-        })
-        .catch(function (error) {
-          console.log('Deu bosta:' + thisnome);
-          console.log(produto);
-        });
-      })
-    
+      const produto = {
+        "Product": {
+          "ean": "",
+          "name": `${nome}`,
+          "description": "",
+          "description_small": "",
+          "price": `100`,
+          "cost_price": `${precoCompra}`,
+          "promotional_price": "",
+          "start_promotion": "",
+          "end_promotion": "",
+          "brand": "",
+          "model": "",
+          "weight": "1",
+          "length": "",
+          "width": "",
+          "height": "",
+          "stock": `${estoque}`,
+          "category_id": "888967495",
+          "available": "1",
+          "availability": "",
+          "availability_days": "",
+          "reference": "",
+          "hot": "",
+          "release": "",
+          "additional_button": "",
+          "related_categories": "",
+          "release_date": "",
+          "shortcut": "",
+          "virtual_product": ""
+        }
+      };
+      resolve(produto);
+    } catch (error) {
+      reject(error);
     }
-    catch(error){
-      console.err(error);
-    }
+  });
 }
 
 
-async function atualizarProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thismarca, thisid){
+async function definirProdutoAtualizado(nome, preco, estoque, precoCompra) {
+  return new Promise((resolve, reject) => {
+    try {
+      let produto = {
+        "Product": {
+          "name": `${nome}`,
+          "price": `100`,
+          "cost_price": `${precoCompra}`,
+          "stock": `${estoque}`,
+          "available": "1"
+        }
+      };
+      resolve(produto);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+
+async function cadastrarProduto(thisnome, thispreco, thisestoque, thisprecoCompra) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await leituraDosDados();
+      const produto = await definirProduto(thisnome, thispreco, thisestoque, thisprecoCompra);
+      const response = await axios.post(`${url}/products?access_token=${acessToken}`, produto);
+      const idRetorno = response.data.id; // Armazena o valor do ID retornado pela API na variável idRetorno
+      resolve(idRetorno);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+
+
+
+async function atualizarProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thisid) {
   try {
     let id;
     await leituraDosDados()
-    .then(() => {id = thisid;})
-    .then(await definirProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thismarca))
-    .then(() => {
-      axios.put(`${url}/products/${id}?access_token=${acessToken}`, produto)
-      .then(response => {
-        console.log('Resposta da API:', response.data);
+      .then(() => {
+        id = thisid;
       })
-      .catch(error => {
-        console.error('Erro ao fazer requisição:', error);
+      .then(() => definirProdutoAtualizado(thisnome, thispreco, thisestoque, thisprecoCompra))
+      .then(produtoAtualizado => {
+        axios.put(`${url}/products/${id}?access_token=${acessToken}`, produtoAtualizado)
+          .then(response => {
+            console.log('Deu certo');
+          })
+          .catch(error => {
+            console.log('erro');
+          });
       });
-    })
-  }
-  catch(error){
-    console.err(error);
+  } catch (error) {
+    console.error(error);
   }
 }
 
 
-async function deletarProduto(thisid){
+
+async function deletarProduto(thisid) {
   try {
     let id = thisid;
     await leituraDosDados()
-    .then((thisid) => {id = thisid})
-    .then(() => {
-      axios.delete(`${url}/products/${id}?access_token=${acessToken}`)
-      .then(response => {
-        console.log('Resposta da API:', response.data);
-      })
-      .catch(error => {
-        console.error('Erro ao fazer requisição:', error);
+      .then(() => {
+        axios.delete(`${url}/products/${id}?access_token=${acessToken}`)
+          .then(response => {
+            console.log('Resposta da API:', response.data);
+          })
+          .catch(error => {
+            console.error('Erro ao fazer requisição:', error);
+          });
       });
-    })
-  }
-  catch(error){
-    console.err(error);
+  } catch (error) {
+    console.error(error);
   }
 }
+
 
 module.exports = {
     createToken,
@@ -234,3 +253,15 @@ module.exports = {
     atualizarProduto,
     deletarProduto
 };
+
+
+/*
+ver se mudança no estoque manda como mundaça para o xml ou deve ser feito lera recorrente. - deve ser feito recorrente 
+ver pra refresh ser feito antes de tudo
+ver erro JSON que ocorre direto
+ver preço e estoque
+ver update
+ver retornos para front
+adicionar input da URL
+adicionar visual inicial
+*/

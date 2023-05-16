@@ -194,49 +194,58 @@ function reqCadastros(Sync) {
 
 
 
-async function retProdutoEstoque(id) {
+function retProdutoEstoque(id) {
+  return new Promise((resolve, reject) => {
     getDominio()
-    .then(() => codificarSenha())
-    .then(() => codificarXmlRetProdutoEstoque(id))
-    .then(() => {
-      const headers = {
-        'Host': 'wsretaguarda.saurus.net.br',
-        'Content-Type': 'text/xml; charset=utf-8',
-        'SOAPAction': 'http://saurus.net.br/retProdutoEstoque'
-      }
+      .then(() => codificarSenha())
+      .then(() => codificarXmlRetProdutoEstoque(id))
+      .then(() => {
+        const headers = {
+          'Host': 'wsretaguarda.saurus.net.br',
+          'Content-Type': 'text/xml; charset=utf-8',
+          'SOAPAction': 'http://saurus.net.br/retProdutoEstoque'
+        };
 
-      const body = `<?xml version="1.0" encoding="utf-8"?>
-      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-        <soap:Body>
-          <retProdutoEstoque xmlns="http://saurus.net.br/">
-            <xBytesParametros>${xBytesParametros}</xBytesParametros>
-            <xSenha>${Password}</xSenha>
-          </retProdutoEstoque>
-        </soap:Body>
-      </soap:Envelope>`
-      axios.post('http://wsretaguarda.saurus.net.br/v001/serviceRetaguarda.asmx', body, { headers })
-        .then((response) => {
-          xml2js.parseString(response.data, async (err, result) => {
-            if (err) {
-              console.error(err);
-            } else {
-              if ((result['soap:Envelope']['soap:Body'][0].retProdutoEstoqueResponse[0].xRetNumero) == 1){
-                console.log('Erro na requisição');
-              } else if((result['soap:Envelope']['soap:Body'][0].retProdutoEstoqueResponse[0].xRetNumero) == 0){
-                let retProdutoEstoqueResult = result['soap:Envelope']['soap:Body'][0].retProdutoEstoqueResponse[0].retProdutoEstoqueResult[0];
-                await decodificarEsalvarEstoque(retProdutoEstoqueResult, id);
+        const body = `<?xml version="1.0" encoding="utf-8"?>
+        <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+          <soap:Body>
+            <retProdutoEstoque xmlns="http://saurus.net.br/">
+              <xBytesParametros>${xBytesParametros}</xBytesParametros>
+              <xSenha>${Password}</xSenha>
+            </retProdutoEstoque>
+          </soap:Body>
+        </soap:Envelope>`;
+
+        axios.post('http://wsretaguarda.saurus.net.br/v001/serviceRetaguarda.asmx', body, { headers })
+          .then((response) => {
+            xml2js.parseString(response.data, async (err, result) => {
+              if (err) {
+                console.error(err);
+                reject(err);
+              } else {
+                if (result['soap:Envelope']['soap:Body'][0].retProdutoEstoqueResponse[0].xRetNumero == 1) {
+                  console.log('Erro na requisição');
+                  reject('Erro na requisição');
+                } else if (result['soap:Envelope']['soap:Body'][0].retProdutoEstoqueResponse[0].xRetNumero == 0) {
+                  let retProdutoEstoqueResult = result['soap:Envelope']['soap:Body'][0].retProdutoEstoqueResponse[0].retProdutoEstoqueResult[0];
+                  await decodificarEsalvarEstoque(retProdutoEstoqueResult, id);
+                  resolve();
+                }
               }
-            }
+            });
+          })
+          .catch((error) => {
+            console.error('Erro na requisição:', error);
+            reject(error);
           });
-        })
-        .catch((error) => {
-          console.error('Erro na requisição:', error);
-        });
-    })
-    .catch((error) => {
-      console.error('Erro ao obter dados:', error);
-    });
+      })
+      .catch((error) => {
+        console.error('Erro ao obter dados:', error);
+        reject(error);
+      });
+  });
 }
+
 
 
 async function getPrecoFromXml(xmlString, id) {
@@ -265,30 +274,33 @@ async function getPrecoFromXml(xmlString, id) {
 
 
 async function getEstoqueXml(id) {
-  return new Promise((resolve, reject) => {
-    const parser = new DOMParser();
-    let xmlString = fs.readFileSync(`../GravacaoXMLprodutoEstoque/cadastros-${id}.xml`, 'utf8');
-    const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+  return new Promise(async (resolve, reject) => {
+        const parser = new DOMParser();
+        let xmlString = fs.readFileSync(`../GravacaoXMLprodutoEstoque/cadastros-${id}.xml`, 'utf8');
+        const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
 
-    const estoqueLojas = xmlDoc.getElementsByTagName('EstoqueLoja');
+        const estoqueLojas = xmlDoc.getElementsByTagName('EstoqueLoja');
 
-    let saldoTotal = 0;
-    for (let i = 0; i < estoqueLojas.length; i++) {
-      const qSaldo = parseFloat(estoqueLojas[i].getAttribute('qSaldo'));
-      saldoTotal += qSaldo;
-    }
-    if(saldoTotal==undefined){
-      console.log('saldo zerado');
-      saldoTotal = 0;
-    }
-    resolve(parseInt(saldoTotal));
-  });
+        let saldoTotal = 0;
+        for (let i = 0; i < estoqueLojas.length; i++) {
+          const qSaldo = parseFloat(estoqueLojas[i].getAttribute('qSaldo'));
+          saldoTotal += qSaldo;
+        }
+        if (saldoTotal == undefined) {
+          console.log('saldo zerado');
+          saldoTotal = 0;
+        }
+        resolve(saldoTotal);
+      })
+      .catch((error) => {
+        reject(error);
+      });
 }
 
 
-async function wsCadastro(){
-   try {
-    let name = await retornaCampo('nameFile'); 
+async function wsCadastro() {
+  try {
+    let name = await retornaCampo('nameFile');
     let xmlString = fs.readFileSync(`../GravacaoXML/${name}`, 'utf8');
     let parser = new DOMParser();
     let xmlDoc = parser.parseFromString(xmlString, 'text/xml');
@@ -296,56 +308,66 @@ async function wsCadastro(){
     let rows = table.getElementsByTagName('row');
 
     for (let i = 0; i < rows.length; i++) {
-      
+
       let idProduto = rows[i].getAttribute('pro_idProduto');
       let exclusaoProduto = rows[i].getAttribute('pro_indStatus');
 
-      
+
       let descProduto = rows[i].getAttribute('pro_descProduto');
       let provPreco = parseFloat(await getPrecoFromXml(xmlString, idProduto));
       let precoProduto = provPreco.toFixed(2);
       let custoProduto = rows[i].getAttribute('pro_vCompra');
-      let marcaProduto = rows[i].getAttributeNS('pro_descMarca');
-      let estoqueProduto;
+      let estoqueProduto = 0;
 
-      await retProdutoEstoque(idProduto);
-      await getEstoqueXml(idProduto).then((saldoTotal) => {
-          estoqueProduto = saldoTotal;
-      }).catch((err) => {
-        console.error(err);
-      });
-      
-      const dados = JSON.parse(fs.readFileSync('./src/build/produtos.json', 'utf8'));
-      if (dados.produtos[idProduto]) {
-          if(exclusaoProduto=="1"){
-            let idTray = dados.produtos[idProduto];
-            await deletarProduto(idTray)
-            .then(() => {
-              delete dados.produtos[idProduto];
-            })
-            .catch((_) => { console.err(_)})
+      await retProdutoEstoque(idProduto)
+      .then(async () => {
+        await getEstoqueXml(idProduto)
+        .then(response => {
+          estoqueProduto = response;
+        })
+        .catch((_) => { console.log('Deu erro aqui 1') })
+      })
+      .then(async () => {
+          const dados = JSON.parse(fs.readFileSync('./src/build/produtos.json', 'utf8'));
+          if (dados.produtos[idProduto]) {
+            if (exclusaoProduto == "1") {
+              let id = dados.produtos[idProduto];
+              let idTray = parseInt(id);
+              await deletarProduto(idTray)
+                .then(() => {
+                  delete dados.produtos[idProduto];
+                })
+                .catch((_) => {
+                  console.error(_);
+                });
+            } else if (exclusaoProduto == "0") {
+              let id = dados.produtos[idProduto];
+              let idTray = parseInt(id);
+              await atualizarProduto(descProduto, null, estoqueProduto, custoProduto, idTray);
+            }
+          } else {
+            if (exclusaoProduto == "1") {
+
+            } else if (exclusaoProduto == "0") {
+              await cadastrarProduto(descProduto, null, estoqueProduto, custoProduto)
+              .then(id => {
+                dados.produtos[idProduto] = id;
+                console.log('AOO' + id);
+              })              
+            }
           }
-          else if(exclusaoProduto=="0"){                       
-            let idTray = dados.produtos[idProduto];
-            await atualizarProduto(descProduto, precoProduto, estoqueProduto, custoProduto, marcaProduto, idTray);
-          }
-      } else {
-          if(exclusaoProduto=="1"){
-           
-          }
-          else if(exclusaoProduto=="0"){
-            dados.produtos[idProduto] = descProduto;
-            await cadastrarProduto(descProduto, precoProduto, estoqueProduto, custoProduto, marcaProduto);
-          }
-      }
-      fs.writeFileSync('./src/build/produtos.json', JSON.stringify(dados));
+          fs.writeFileSync('./src/build/produtos.json', JSON.stringify(dados));
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+
     }
-
   } catch (err) {
     console.error(err);
   }
-
 }
+
 
 
 async function autorizarAcesso(retCadastrosResult) {
@@ -391,13 +413,12 @@ function sincronizacaoContinua(data){
   .then(() => {
     getData(data);
     reqCadastros(1);
-    //
     setInterval(function() {
       setDate();
       reqCadastros(2);
       //
-    }, ((minutos*60)+segundos)*1000);
-  })
+    }, 60000);
+  })/*((minutos*60)+segundos)*1000  */
 }
 
 
