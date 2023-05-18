@@ -6,7 +6,7 @@ function sincronizacaoUnica() {
     let datetimeValue = new Date(datetimeInput);
     let dateTimeNow = new Date();
 
-    if(dateTimeNow.getTime() - datetimeValue.getTime() >= 10 * 60 * 1000){
+    if(dateTimeNow.getTime() - datetimeValue.getTime() >= 30 * 60 * 1000){
         fetch(`http://localhost:3000/sincronizacaoUnica/${datetimeInput}`)
         .then(response => response.text())
         .then(data => {
@@ -17,7 +17,7 @@ function sincronizacaoUnica() {
         });
     }
     else{
-        alert('Favor, insira um horário com 10 minutos ou mais de antecedência ao horário atual');
+        alert('Favor, insira um horário com 30 minutos ou mais de antecedência ao horário atual');
     }
 }
 
@@ -32,12 +32,12 @@ function sincronizacaoContinua(){
     let datetimeValue = new Date(datetimeInput);
     let dateTimeNow = new Date();
 
-    if(dateTimeNow.getTime() - datetimeValue.getTime() >= 10 * 60 * 1000){
-        console.log('Tempo superior a 10 minutos');
+    if(dateTimeNow.getTime() - datetimeValue.getTime() >= 30 * 60 * 1000){
+        console.log('Tempo superior a 15 minutos');
         sincronizar = true;
     }
     else{
-        sincronizar = confirm('Caso tenha inserido/modificado/deletado algum produto nos últimos 10 minutos, essa modificação não será carregada. Deseja prosseguir ou voltar e inserir um horário inicial maior?');
+        sincronizar = confirm('Caso tenha inserido/modificado/deletado algum produto nos últimos 30 minutos, essa modificação não será carregada. Deseja prosseguir ou voltar e inserir um horário inicial maior?');
     }
 
     if(sincronizar==true){
@@ -99,11 +99,10 @@ function saveSaurus(){
  * Função de requisição para porta 3000 para gravar dados do cadastro de informações da Tray
  */
 function saveTray(){
-    let consumer_key = document.getElementById('consumerkey-input').value;
-    let consumer_secret = document.getElementById('consumersecret-input').value;
     let code = document.getElementById('code-input').value;
+    let url = document.getElementById('url-input').value;
 
-    fetch(`http://localhost:3000/saveTray/${consumer_key}/${consumer_secret}/${code}`)
+    fetch(`http://localhost:3000/saveTray/${code}/${url}`)
     .then(response => response.text())
     .then(data =>{
         console.log('Fetch concluido');
@@ -126,8 +125,8 @@ function saveGeral(){
     let time = timerInput.split(":");
     let segundos = (+time[0]) * 60 + (+time[1]);
 
-    if(segundos < 600){
-        alert('Favor, insira um timer de requisição superior a 10 minutos;')
+    if(segundos < 1800){
+        alert('Favor, insira um timer de requisição superior a 30 minutos;')
     }
     else{
         
@@ -167,9 +166,8 @@ function carregarInfoTray(){
     fetch('http://localhost:3000/carregarInfo')
     .then(response => response.json())
     .then(dados =>{
-        document.getElementById('consumerkey-input').value = dados[3];
-        document.getElementById('consumersecret-input').value = dados[4];
-        document.getElementById('code-input').value = dados[5];
+        document.getElementById('code-input').value = dados[3];
+        document.getElementById('url-input').value = dados[4];
     });
 }
 
@@ -193,8 +191,6 @@ function carregarData(){
     data.setHours(data.getHours() - 3);
     document.getElementById('datetime-input').value = data.toISOString().slice(0, 16);;
 }
-
-
 
 
 /**

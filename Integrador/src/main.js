@@ -33,8 +33,8 @@ expss.get(`/saveSaurus/:chave/:dominio`, (req, res) => {
   salvarDados(req.params.chave, req.params.dominio, null, 'saurus');
 });
 
-expss.get(`/saveTray/:consumer_key/:consumer_secret/:code`, (req, res) => {
-  salvarDados(req.params.consumer_key, req.params.consumer_secret, req.params.code, 'tray');
+expss.get(`/saveTray/:code/:url`, (req, res) => {
+  salvarDados(req.params.code, req.params.url, null, 'tray');
 });
 
 expss.get(`/saveGeral/:timer`, (req, res) =>{
@@ -86,7 +86,7 @@ function createWindow() {
       nodeIntegration: true,
     },
   });
-  win.loadFile("index.html");
+  win.loadFile("./pages/startSync.html");
 }
 
 app.whenReady().then(createWindow);
@@ -102,11 +102,3 @@ app.on("activate", () => {
     createWindow();
   }
 });
-
-
-
-
-/*
-TESTAR DELETE
-VER PARA FAZER FOR COM TODAS AS row DO XML RETORNANDO NO ReqCadastros
-*/

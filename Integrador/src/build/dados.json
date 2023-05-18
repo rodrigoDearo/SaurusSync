@@ -5,17 +5,15 @@
       "dominio": "testesdrsistema"
     },
     "geral": {
-      "timer": "12:00",
-      "ultimo_file": "cadastros-2023-05-16 13-50.xml"
+      "timer": "16:00",
+      "ultimo_file": "cadastros-2023-05-18 09-45.xml"
     },
     "tray": {
-      "consumer_key": "9f52214d3ff8cf0629d1fcfa3bd6a5b5e4fbc21a62305a7d6b450dc64a90cf68",
-      "consumer_secret": "68e7ba3319a5b96eece177867a3c6212e7ec930c0ac89b719e1adcaaa6bc380f",
       "code": "dca5f05b40953367511bafc9cf7cc1f54a69ba6179b1078b55626d4323b6dbe1",
-      "access_token": "APP_ID-5005-STORE_ID-391250-e1da7085589a66cd5a2b0dc630d4108e6a7b2c233202eabf4a0a47ed150b8ef9",
-      "refresh_token": "8d2cab7f9542136698e21022d2a90a13102d9cd9ec60f10e4773566838fdf7f8",
-      "date_expiration_access_token": "2023-05-16 15:31:00",
-      "date_expiration_refresh_token": "2023-06-15 12:31:00",
+      "access_token": "APP_ID-5005-STORE_ID-391250-9575cc8180e195978f8e26430586b99fd838c420342c4e8dc22250b61438eeff",
+      "refresh_token": "1f238dfb1596250354af9b39e67a07d1fa22b86c816190e222be4898914a012b",
+      "date_expiration_access_token": "2023-05-18 09:58:11",
+      "date_expiration_refresh_token": "2023-06-17 06:58:11",
       "url": "https://391250.commercesuite.com.br/web_api"
     }
   }

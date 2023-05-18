@@ -50,11 +50,11 @@ function criarEziparArquivoXml(){
         if (err) {
           reject(err);
         }
-  
         let now = moment().utc().subtract(3, 'hours').format('YYYY-MM-DD HH-mm');
         fileName = `cadastros-${now}.xml`;
         await salvarDados(fileName, null, null, 'geral_file');
         const readStream = stream.Readable.from(result); // Cria um stream de leitura a partir dos dados descompactados
+
         readStream.pipe(fs.createWriteStream(`../GravacaoXML/${fileName}`)) // Grava os dados em um arquivo
           .on('error', function(err) {
             reject(err);

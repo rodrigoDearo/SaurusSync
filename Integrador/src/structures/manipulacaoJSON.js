@@ -27,9 +27,8 @@ async function salvarDados(campo1, campo2, campo3, systemSave){
         break;
 
       case 'tray':
-        dadosApp.dadosApp.tray.consumer_key = campo1;
-        dadosApp.dadosApp.tray.consumer_secret = campo2;
-        dadosApp.dadosApp.tray.code = campo3;
+        dadosApp.dadosApp.tray.code = campo1;
+        dadosApp.dadosApp.tray.url = campo2;
         break;
 
       case 'geral_file':
@@ -68,9 +67,8 @@ function retornarDados() {
           dados.dadosApp.saurus.chave,
           dados.dadosApp.saurus.dominio,
           dados.dadosApp.geral.timer,
-          dados.dadosApp.tray.consumer_key,
-          dados.dadosApp.tray.consumer_secret,
-          dados.dadosApp.tray.code
+          dados.dadosApp.tray.code,
+          dados.dadosApp.tray.url
         ];
         resolve(dadosRetorno);
       }

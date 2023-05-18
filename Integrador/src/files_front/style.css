@@ -41,9 +41,6 @@ body{
     margin-top: 35px;
 }
 
-#formularioFull-tray{
-    margin-top: 15px;
-}
 
 .input-text{
     border: 0.8px solid black;
@@ -56,10 +53,6 @@ body{
 
 #last-input{
     padding-bottom: 25px;
-}
-
-#last-input-tray{
-    padding-bottom: 10px;
 }
 
 .botao-save{

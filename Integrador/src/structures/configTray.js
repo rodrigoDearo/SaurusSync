@@ -3,7 +3,7 @@ const axios = require('axios');
 const fs = require('fs');
 const { resolve } = require('path');
 
-var consumerSecret, consumerKey, code, url, tokenRefresh, acessToken, produto;
+var consumerSecret, consumerKey, code, url, tokenRefresh, acessToken;
 
 
 /**
@@ -50,8 +50,8 @@ function leituraDosDados() {
         let dados = JSON.parse(data);
   
         try {
-          consumerKey = dados.dadosApp.tray.consumer_key;
-          consumerSecret = dados.dadosApp.tray.consumer_secret;
+          consumerKey = "9f52214d3ff8cf0629d1fcfa3bd6a5b5e4fbc21a62305a7d6b450dc64a90cf68";
+          consumerSecret = "68e7ba3319a5b96eece177867a3c6212e7ec930c0ac89b719e1adcaaa6bc380f";
           code = dados.dadosApp.tray.code;
           url = dados.dadosApp.tray.url;
           tokenRefresh = dados.dadosApp.tray.refresh_token;
@@ -123,7 +123,7 @@ async function refreshToken(){
 }
 
 
-async function definirProduto(nome, preco, estoque, precoCompra) {
+async function definirProduto(nome, estoque, precoCompra) {
   return new Promise((resolve, reject) => {
     try {
       const produto = {
@@ -132,7 +132,7 @@ async function definirProduto(nome, preco, estoque, precoCompra) {
           "name": `${nome}`,
           "description": "",
           "description_small": "",
-          "price": `100`,
+          "price": `0`,
           "cost_price": `${precoCompra}`,
           "promotional_price": "",
           "start_promotion": "",
@@ -144,7 +144,7 @@ async function definirProduto(nome, preco, estoque, precoCompra) {
           "width": "",
           "height": "",
           "stock": `${estoque}`,
-          "category_id": "888967495",
+          "category_id": "",
           "available": "1",
           "availability": "",
           "availability_days": "",
@@ -166,18 +166,32 @@ async function definirProduto(nome, preco, estoque, precoCompra) {
 }
 
 
+
 async function definirProdutoAtualizado(nome, preco, estoque, precoCompra) {
   return new Promise((resolve, reject) => {
     try {
       let produto = {
         "Product": {
-          "name": `${nome}`,
-          "price": `100`,
-          "cost_price": `${precoCompra}`,
-          "stock": `${estoque}`,
-          "available": "1"
+
         }
       };
+
+      if(nome != null){
+        produto.Product["name"] = `${nome}`;
+      }
+
+      if(preco != null){
+        produto.Product["price"] = `${preco}`;
+      }
+
+      if(precoCompra != null){
+        produto.Product["cost_price"] = `${precoCompra}`
+      }
+
+      if(estoque != null){
+        produto.Product["stock"] = `${estoque}`;
+      }
+
       resolve(produto);
     } catch (error) {
       reject(error);
@@ -186,11 +200,11 @@ async function definirProdutoAtualizado(nome, preco, estoque, precoCompra) {
 }
 
 
-async function cadastrarProduto(thisnome, thispreco, thisestoque, thisprecoCompra) {
+async function cadastrarProduto(thisnome, thisestoque, thisprecoCompra) {
   return new Promise(async (resolve, reject) => {
     try {
       await leituraDosDados();
-      const produto = await definirProduto(thisnome, thispreco, thisestoque, thisprecoCompra);
+      const produto = await definirProduto(thisnome, thisestoque, thisprecoCompra);
       const response = await axios.post(`${url}/products?access_token=${acessToken}`, produto);
       const idRetorno = response.data.id; // Armazena o valor do ID retornado pela API na variável idRetorno
       resolve(idRetorno);
@@ -246,22 +260,36 @@ async function deletarProduto(thisid) {
 }
 
 
+async function cadastrarImagem(id, img){
+  return new Promise(async (resolve, reject) => {
+    try {
+      await axios.post(`${url}/products/${id}/images?access_token=${acessToken}`, {
+        "Images": {
+          "picture_source_1": img
+        }
+      });
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
 module.exports = {
     createToken,
     refreshToken,
     cadastrarProduto,
     atualizarProduto,
-    deletarProduto
+    deletarProduto,
+    cadastrarImagem
 };
 
 
 /*
 ver se mudança no estoque manda como mundaça para o xml ou deve ser feito lera recorrente. - deve ser feito recorrente 
-ver pra refresh ser feito antes de tudo
-ver erro JSON que ocorre direto
-ver preço e estoque
-ver update
+ver para rodar em segundo plano
+docuementar codigo
+ver log txt de erro
 ver retornos para front
-adicionar input da URL
-adicionar visual inicial
+TESTAR ALTERAÇÃO DE PRODUTO NAO CADASTRADO TRAY
 */
