@@ -1,28 +1,39 @@
 // IMPORTANDO MÓDULOS E BIBLIOTECAS 
 const express = require('express');
 const { salvarDados, retornarDados } = require('./structures/manipulacaoJSON');
-const { sincronizacaoUnica, sincronizacaoContinua } = require('./structures/reqCadastros');
-const { createToken, refreshToken, cadastrarProduto, atualizarProduto, deletarProduto } = require('./structures/configTray');
+const { sincronizacaoUnica, sincronizacaoContinua, atualizarEstoque } = require('./structures/reqCadastros');
 
 
 
 
-// EXECUTAR FUNÇÕES 
 
 
 // ---------------------- EXPRESS JS ---------------------- //
 
 const expss = express();
 
-expss.get('/sincronizacaoUnica/:data', (req, res) => {
-    sincronizacaoUnica(req.params.data);
-    console.log('Sincronização Única Realizada');
+expss.get('/sincronizacaoUnica/:data', async (req, res) => {
+  console.log('Sincronização Única Realizada');
+
+  await sincronizacaoUnica(req.params.data)
+  .then((response) => {
+    res.status(200).send(response);
+  })
+  .catch((error) => {
+    res.status(500).send(error);
+  });
 });
 
-expss.get('/sincronizacaoContinua/:data', (req, res) =>{
-  sincronizacaoContinua(req.params.data);
-  console.log('Sincronização Contínua Executada');
-});
+expss.get('/atualizarEstoque', async (req, res) => {
+  console.log('Atualização de Estoque Realizada');
+  await atualizarEstoque()
+  .then((response) => {
+    res.status(200).send(response);
+  })
+  .catch((error) => {
+    res.status(500).send('Erro na Sincronização Única: ' + error);
+  });
+})
 
 expss.get('/closeApp', (req, res) => {
     console.log('Função de fechamento do APP executada !');
@@ -30,15 +41,33 @@ expss.get('/closeApp', (req, res) => {
 });
 
 expss.get(`/saveSaurus/:chave/:dominio`, (req, res) => {
-  salvarDados(req.params.chave, req.params.dominio, null, 'saurus');
+  salvarDados(req.params.chave, req.params.dominio, null, 'saurus')
+  .then((response) => {
+    res.status(200).send(response);
+  })
+  .catch((error) => {
+    res.status(500).send('Erro na Atualizar Dados');
+  })
 });
 
 expss.get(`/saveTray/:code/:url`, (req, res) => {
-  salvarDados(req.params.code, req.params.url, null, 'tray');
+  salvarDados(req.params.code, req.params.url, null, 'tray')
+  .then((response) => {
+    res.status(200).send(response);
+  })
+  .catch((error) => {
+    res.status(500).send('Erro na Atualizar Dados');
+  })
 });
 
 expss.get(`/saveGeral/:timer`, (req, res) =>{
-  salvarDados(req.params.timer, null, null, 'geral');
+  salvarDados(req.params.timer, null, null, 'geral')
+  .then((response) => {
+    res.status(200).send(response);
+  })
+  .catch((error) => {
+    res.status(500).send('Erro na Atualizar Dados');
+  })
 });
 
 expss.get(`/carregarInfo`, (req, res) =>{
@@ -59,11 +88,15 @@ expss.listen(3000, () => {
 
 // ---------------------- ELECTRON JS ---------------------- //
 
-const { app, BrowserWindow, nativeImage } = require("electron");
+const {  app, BrowserWindow, nativeImage, Tray, Menu } = require("electron");
+const path = require("path");
+const electronReload = require('electron-reload');
 
-require("electron-reload")(__dirname, {
-  electron: require(`${__dirname}/../node_modules/electron`),
-});
+
+/*electronReload(__dirname);*/
+
+let win = null; // Variável global para armazenar a instância da janela
+let tray = null; // Variável global para armazenar a instância do ícone na bandeja
 
 // Função que cria uma janela desktop
 function createWindow() {
@@ -76,7 +109,7 @@ function createWindow() {
 
 
   // CRIA UMA JANELA DESKTOP
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     icon,
     width: 650,
     height: 400,
@@ -86,7 +119,21 @@ function createWindow() {
       nodeIntegration: true,
     },
   });
-  win.loadFile("./pages/startSync.html");
+  win.loadFile("./index.html");
+
+  tray = new Tray(icon);
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Abrir', click: () => win.show() },
+    { label: 'Fechar', click: () => app.quit() }
+  ]);
+  tray.setToolTip('Seu aplicativo');
+  tray.setContextMenu(contextMenu);
+
+  // Evento para minimizar a janela quando ela for fechada
+  win.on('close', (event) => {
+    event.preventDefault();
+    win.hide();
+  });
 }
 
 app.whenReady().then(createWindow);
@@ -101,4 +148,18 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+expss.get('/sincronizacaoContinua/:data', (req, res) =>{
+  sincronizacaoContinua(req.params.data)
+  .then((response) => {
+    if (win) {
+      win.setSkipTaskbar(true);
+      win.minimize(); // Minimiza a janela
+    }
+    console.log('Sincronização Contínua Executada');
+  })
+  .catch((error) => {
+    res.status(500).send(error);
+  });
 });

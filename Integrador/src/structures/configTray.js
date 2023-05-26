@@ -1,5 +1,6 @@
 /* ---------------------- IMPORTAÇÃO DE MÓDULOS ----------------------*/
 const axios = require('axios');
+const { Console } = require('console');
 const fs = require('fs');
 const { resolve } = require('path');
 
@@ -85,7 +86,7 @@ async function createToken() {
             'Content-Type': 'application/x-www-form-urlencoded'
             }
         };
-  
+        
         axios.post(`${url}/auth`, keysValue, config)
         .then((response) => {
             gravarDados(response.data);
@@ -110,7 +111,6 @@ async function refreshToken(){
             refresh_token: tokenRefresh
         } })
         .then((response) => {
-            console.log(response.data)
             gravarDados(response.data);
         })
         .catch((error) => {
@@ -206,8 +206,9 @@ async function cadastrarProduto(thisnome, thisestoque, thisprecoCompra) {
       await leituraDosDados();
       const produto = await definirProduto(thisnome, thisestoque, thisprecoCompra);
       const response = await axios.post(`${url}/products?access_token=${acessToken}`, produto);
-      const idRetorno = response.data.id; // Armazena o valor do ID retornado pela API na variável idRetorno
-      resolve(idRetorno);
+      const id = response.data.id
+
+      resolve(id);
     } catch (error) {
       reject(error);
     }
@@ -228,10 +229,9 @@ async function atualizarProduto(thisnome, thispreco, thisestoque, thisprecoCompr
       .then(produtoAtualizado => {
         axios.put(`${url}/products/${id}?access_token=${acessToken}`, produtoAtualizado)
           .then(response => {
-            console.log('Deu certo');
           })
           .catch(error => {
-            console.log('erro');
+            console.log(error);
           });
       });
   } catch (error) {
@@ -248,7 +248,7 @@ async function deletarProduto(thisid) {
       .then(() => {
         axios.delete(`${url}/products/${id}?access_token=${acessToken}`)
           .then(response => {
-            console.log('Resposta da API:', response.data);
+            
           })
           .catch(error => {
             console.error('Erro ao fazer requisição:', error);
@@ -267,7 +267,7 @@ async function cadastrarImagem(id, img){
         "Images": {
           "picture_source_1": img
         }
-      });
+      })
       resolve();
     } catch (error) {
       reject(error);
@@ -286,10 +286,15 @@ module.exports = {
 
 
 /*
-ver se mudança no estoque manda como mundaça para o xml ou deve ser feito lera recorrente. - deve ser feito recorrente 
-ver para rodar em segundo plano
-docuementar codigo
-ver log txt de erro
-ver retornos para front
-TESTAR ALTERAÇÃO DE PRODUTO NAO CADASTRADO TRAY
+
+documentar codigo
+testes
+testar caso nao tenha pasta
+retirar categoria
+
+APP EM EXECUTAVEL---
+
+
+
+
 */

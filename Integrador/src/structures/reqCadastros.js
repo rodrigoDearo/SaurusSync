@@ -5,11 +5,16 @@ const { createToken, refreshToken, cadastrarProduto, atualizarProduto, deletarPr
 const axios = require('axios');
 const xml2js = require('xml2js');
 const fs = require('fs');
+const path = require('path');
 const { DOMParser } = require('xmldom');
 
 
 var Dominio, ChaveCaixa, xBytesParametros, Password, TpSync, DateTime, minutos, segundos;
-
+var produtosCadastrados = 0;
+var produtosDeletados = 0;
+var produtosModificados = 0;
+var mensagemRetorno, numeroCadastros;
+var sincUnica;
 /**
  *  Função para retornar a data a ser enviado para requisição continua Saurus, atribuindo o horário da requisição baseada no tiemr da configuração geral
  * @returns {Datetime}  data no formato ISO8601 para ser enviada no corpo da requisição de cadastro Saurus
@@ -18,14 +23,16 @@ function setDate() {
   return new Promise((resolve, reject) => {
     try {
       let data = new Date();
-      data.setHours(data.getHours() - 3);
+      data.setHours(data.getHours() - 4);
       data.setMinutes(data.getMinutes() - minutos);
       data.setSeconds(data.getSeconds() - segundos);
+      console.log(`Data > ${data}`);
       let dataISO8601 = data.toISOString();
       data = dataISO8601.slice(0, -5);
       data += '-03:0';
       DateTime = data;
-      resolve(DateTime); 
+      console.log('Puxando mudancas desde: ' + DateTime);
+      resolve(DateTime);
     } catch (error) {
       reject(error);
     }
@@ -36,7 +43,7 @@ function setDate() {
  * Define a senha para ser enviada na requisição para consumir WebService Saurus
  * @returns {senha} no padrão consultado com desenvolvdedores do software
  */
-function setSenha(){
+function setSenha() {
   let dataAtual = new Date();
   let dia = dataAtual.getDate();
   let mes = dataAtual.getMonth();
@@ -56,7 +63,7 @@ async function getChaveCaixa() {
     let chaveRetorno = await retornaCampo('chave');
     ChaveCaixa = chaveRetorno;
   } catch (err) {
-    console.error('Erro ao retornar dados:', err);
+    gravarLogErro('Erro ao retornar dados:', err);
   }
 }
 
@@ -82,10 +89,12 @@ function getTimerJSON() {
  * @param {*} data data informada no input como base para requisição 
  * @returns {DateTime} a mesma data recebida como parametro porém estruturada no formado solicitado para consumo do WebService (adição do fuso hórario)
  */
-function getData(data){
+function getData(data) {
+  return new Promise((resolve, reject) => {
     DateTime = data + ':00-03:0';
     console.log(DateTime);
-    return DateTime;
+    resolve(DateTime);
+  })
 }
 
 
@@ -97,7 +106,7 @@ async function getDominio() {
     let dominioRetorno = await retornaCampo('dominio');
     Dominio = dominioRetorno;
   } catch (err) {
-    console.error('Erro ao retornar dados:', err);
+    gravarLogErro('Erro ao retornar dados:', err);
   }
 }
 
@@ -115,12 +124,12 @@ async function codificarXmlReqCadastro() {
       <DhReferencia>${DateTime}</DhReferencia>
 </xmlIntegracao>`);
   } catch (err) {
-    console.error('Erro ao codificar xmlReqCadastro:', err);
+    gravarLogErro('Erro ao codificar xmlReqCadastro:', err);
   }
 }
 
 
-async function codificarXmlRetProdutoEstoque(idParametro){
+async function codificarXmlRetProdutoEstoque(idParametro) {
   try {
     let idProdutoColsulta = idParametro;
     xBytesParametros = codificarInBase64(`<xmlIntegracao>
@@ -129,8 +138,8 @@ async function codificarXmlRetProdutoEstoque(idParametro){
     <CodProduto/>
   </xmlIntegracao>`);
   }
-  catch(err){
-    console.err('Erro ao codificar xmlRetProdutoEstoque:', err)
+  catch (err) {
+    gravarLogErro('Erro ao codificar xmlRetProdutoEstoque:', err)
   }
 }
 
@@ -138,11 +147,11 @@ async function codificarXmlRetProdutoEstoque(idParametro){
 /**
  * Função para codificar a senha en base 64 para ser enviada no corpo da requisição e consumo do WebService
  */
-async function codificarSenha(){
-  try{
+async function codificarSenha() {
+  try {
     Password = codificarInBase64(setSenha());
   }
-  catch (err){
+  catch (err) {
     console.err('Erro ao codificar Senha:', err);
   }
 }
@@ -153,61 +162,74 @@ async function codificarSenha(){
  * @param {*} Sync paramêtro informado para realização da requisição (explicação dos valores passados a Sync são explicados na documentação)
  */
 function reqCadastros(Sync) {
-  getChaveCaixa()
-    .then(() => {
-      TpSync = Sync;
-    })
-    .then(() => getDominio())
-    .then(() => codificarSenha())
-    .then(() => codificarXmlReqCadastro())
-    .then(() => {
-      const headers = {
-        'Content-Type': 'text/xml; charset=utf-8',
-        'SOAPAction': 'http://saurus.net.br/retCadastros'
-      }
+  return new Promise((resolve, reject) => {
+    getChaveCaixa()
+      .then(() => {
+        TpSync = Sync;
+      })
+      .then(() => getDominio())
+      .then(() => codificarSenha())
+      .then(() => codificarXmlReqCadastro())
+      .then(() => {
+        const headers = {
+          'Content-Type': 'text/xml; charset=utf-8',
+          'SOAPAction': 'http://saurus.net.br/retCadastros'
+        }
 
-      const body = `<?xml version="1.0" encoding="utf-8"?>
-      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-        <soap:Body>
-          <retCadastros xmlns="http://saurus.net.br/">
-            <xBytesParametros>${xBytesParametros}</xBytesParametros>
-            <xSenha>${Password}</xSenha>
-          </retCadastros>
-        </soap:Body>
-      </soap:Envelope>`
+        const body = `<?xml version="1.0" encoding="utf-8"?>
+        <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+          <soap:Body>
+            <retCadastros xmlns="http://saurus.net.br/">
+              <xBytesParametros>${xBytesParametros}</xBytesParametros>
+              <xSenha>${Password}</xSenha>
+            </retCadastros>
+          </soap:Body>
+        </soap:Envelope>`
+        axios.post('https://wscadastros.saurus.net.br/v001/serviceCadastros.asmx', body, { headers })
+          .then((response) => {
+            xml2js.parseString(response.data, async (err, result) => {
+              if (err) {
+                gravarLogErro(err);
+              } else {
 
-      axios.post('https://wscadastros.saurus.net.br/v001/serviceCadastros.asmx', body, { headers })
-        .then((response) => {
-          xml2js.parseString(response.data, async (err, result) => {
-            if (err) {
-              console.error(err);
-            } else {
-
-              if ((result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].xRetNumero[0]) == '1'){
-                console.log('Erro na requisição 1');
-              } else{
-                if(result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult == undefined){
-                  wsCadastro();
-                }
-                else{
-                  let retCadastrosResult = result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult[0];
-                  await autorizarAcesso(retCadastrosResult)
-                  .then(() => {
-                    wsCadastro();
-                  })
-                  .catch((_) => { console.err('Erro ao gerar chaves de acesso') })
+                if ((result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].xRetNumero[0]) == '1') {
+                  reject('Verifique as informações cadastradas, se estão preenchidas corretamente. Caso esteja tudo de acordo entre em contato com desenvolvimento para averiguar');
+                } else {
+                  if (result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult == undefined) {
+                    console.log('Não foi encontrado mudanças para serem carregadas');
+                    gravarLog('Não foi encontrado mudanças para serem carregadas');
+                    mensagemRetorno = 'Não foi encontrado mudanças para serem carregadas';
+                    resolve();
+                  }
+                  else {
+                    let retCadastrosResult = result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].retCadastrosResult[0];
+                    await autorizarAcesso(retCadastrosResult)
+                      .then(async () => {
+                        await wsCadastro()
+                        .then(async () => {
+                          await uploadImages();
+                        })
+                        .then(async () => {
+                          await uploadPreco();
+                        })
+                        .then(() => {
+                          resolve();
+                        })
+                      })
+                      .catch((_) => { gravarLogErro('Erro ao gerar chaves de acesso') })
+                  }
                 }
               }
-            }
+            });
+          })
+          .catch((error) => {
+            gravarLogErro('Erro na requisição 2:', error);
           });
-        })
-        .catch((error) => {
-          console.error('Erro na requisição 2:', error);
-        });
-    })
-    .catch((error) => {
-      console.error('Erro ao obter dados:', error);
-    });
+      })
+      .catch((error) => {
+        gravarLogErro('Erro ao obter dados:', error);
+      });
+  });
 }
 
 
@@ -238,29 +260,32 @@ function retProdutoEstoque(id) {
           .then((response) => {
             xml2js.parseString(response.data, async (err, result) => {
               if (err) {
-                console.error(err);
+                gravarLogErro(err);
                 reject(err);
               } else {
                 if (result['soap:Envelope']['soap:Body'][0].retProdutoEstoqueResponse[0].xRetNumero == 1) {
-                  console.log('Erro na requisição 3');
-                  reject('Erro na requisição 4');
+                  gravarLogErro('Erro na requisição 6')
+                  resolve(0);
                 } else if (result['soap:Envelope']['soap:Body'][0].retProdutoEstoqueResponse[0].xRetNumero == 0) {
                   let retProdutoEstoqueResult = result['soap:Envelope']['soap:Body'][0].retProdutoEstoqueResponse[0].retProdutoEstoqueResult[0];
-                  await decodificarEsalvarEstoque(retProdutoEstoqueResult, id)
-                  .then(() => {
-                    resolve();
+                  await VerificaAutorizarAcesso()
+                  .then(async () => {
+                    await decodificarEsalvarEstoque(retProdutoEstoqueResult, id)
+                    .then(() => {
+                      resolve(1);
+                    })
                   })
                 }
               }
             });
           })
           .catch((error) => {
-            console.error('Erro na requisição 5', error);
-            reject(error);
+            gravarLogErro('Erro na requisição 5');
+            resolve(0);
           });
       })
       .catch((error) => {
-        console.error('Erro na requisição 6', error);
+        gravarLogErro('Erro na requisição 6');
         reject(error);
       });
   });
@@ -282,13 +307,13 @@ async function getEstoqueXml(id) {
     }
 
     if (isNaN(saldoTotal)) {
-      console.log('saldo zerado');
+      gravarLogErro(`O estoque do produto de id Saurus: ${id} foi zerado devido a um erro ao pegar estoque no XML`);
       saldoTotal = 0;
     }
 
     return saldoTotal;
   } catch (error) {
-    console.error(error);
+    gravarLogErro(error);
     throw error;
   }
 }
@@ -297,116 +322,199 @@ async function getEstoqueXml(id) {
 
 
 async function wsCadastro() {
-  try {
-    let name = await retornaCampo('nameFile');
-    let xmlString = fs.readFileSync(`../GravacaoXML/${name}`, 'utf8');
-    let parser = new DOMParser();
-    let xmlDoc = parser.parseFromString(xmlString, 'text/xml');
-    let table = xmlDoc.getElementsByTagName('tbProdutoDados')[0];
-    if(table==undefined){
-      console.log('Sem novos produtos/alterações para cadastro');
-      atualizarEstoque();
-    }
-    else{
-      await atualizarEstoque();
-      let rows = table.getElementsByTagName('row');
-      
-    for (let i = 0; i < rows.length; i++) {
-
-      let idProduto = rows[i].getAttribute('pro_idProduto');
-      let exclusaoProduto = rows[i].getAttribute('pro_indStatus');
-
-
-      let descProduto = rows[i].getAttribute('pro_descProduto');
-      let custoProduto = rows[i].getAttribute('pro_vCompra');
-      let estoqueProduto = 0;
-
-      await retProdutoEstoque(idProduto)
-      .then(async () => {
-        await getEstoqueXml(idProduto)
-        .then(response => {
-          estoqueProduto = response;
-        })
-        .catch((_) => { console.log('Deu erro aqui 1') })
-      })
-      .then(async () => {
-          const dados = JSON.parse(fs.readFileSync('./src/build/produtos.json', 'utf8'));
-          if (dados.produtos[idProduto]) {
-            if (exclusaoProduto == "1") {
-              let id = dados.produtos[idProduto];
-              let idTray = parseInt(id);
-              await deletarProduto(idTray)
-                .then(() => {
-                  delete dados.produtos[idProduto];
-                })
-                .catch((_) => {
-                  console.error(_);
-                });
-            } else if (exclusaoProduto == "0") {
-              let id = dados.produtos[idProduto];
-              let idTray = parseInt(id);
-              await atualizarProduto(descProduto, null, estoqueProduto, custoProduto, idTray);
-            }
-          } else {
-            if (exclusaoProduto == "1") {
-
-            } else if (exclusaoProduto == "0") {
-              await cadastrarProduto(descProduto, estoqueProduto, custoProduto)
-              .then(id => {
-                dados.produtos[idProduto] = id;
-              })              
-            }
-          }
-          fs.writeFileSync('./src/build/produtos.json', JSON.stringify(dados));
-          await uploadImages()
-          .then(() => {
-            uploadPreco();
-          })
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    
+  return new Promise(async (resolve, reject) => {
+    try {
+      let name = await retornaCampo('nameFile');
+      let xmlString = fs.readFileSync(`../GravacaoXML/${name}`, 'utf8');
+      let parser = new DOMParser();
+      let xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+      let table = xmlDoc.getElementsByTagName('tbProdutoDados')[0];
+      if (table == undefined) {
+        gravarLog('Sem novos produtos/alterações para cadastro');
+        mensagemRetorno = 'Não foi encontrado mudanças para serem carregadas';
+        resolve();
       }
+      else {
+        let rows = table.getElementsByTagName('row');
+        numeroCadastros = rows.length;
+        gravarLog(`Numero de cadastros: ${numeroCadastros}`);
+
+        for (let i = 0; i < rows.length; i++) {
+              await VerificaAutorizarAcesso()
+              .then(async () => {
+                gravarLog(`Contagem: ${i}`)
+                let idProduto = rows[i].getAttribute('pro_idProduto');
+                let exclusaoProduto = rows[i].getAttribute('pro_indStatus');
+  
+                let descProduto = rows[i].getAttribute('pro_descProduto');
+                let custoProduto = rows[i].getAttribute('pro_vCompra');
+                let estoqueProduto = 0;
+  
+                const dados = JSON.parse(fs.readFileSync('./src/build/produtos.json', 'utf8'));
+                if (dados.produtos[idProduto]) {
+                  if (exclusaoProduto == "1") {
+                    let id = dados.produtos[idProduto];
+                    let idTray = parseInt(id);
+                    await deletarProduto(idTray)
+                      .then(() => {
+                        delete dados.produtos[idProduto];
+                        gravarLog(`Produto deletado: ${idProduto}`);
+                        produtosDeletados++;
+                      })
+                      .catch((_) => {
+                        gravarLogErro(_);
+                      });
+                  } else if (exclusaoProduto == "0") {
+                    gravarLog(`Produto já cadastrado, id ${idProduto}`);
+                    if(sincUnica==0){
+                      let id = dados.produtos[idProduto];
+                      let idTray = parseInt(id);
+                      await retProdutoEstoque(idProduto)
+                      .then(async sucess => {
+                        if (sucess == 1) {
+                          await getEstoqueXml(idProduto)
+                            .then(response => {
+                              estoqueProduto = response;
+                            })
+                            .catch((_) => { gravarLogErro('Deu erro aqui 1') })
+                        }
+                        else {
+                          gravarLogErro(`Estoque do produto ${idProduto} foi zerado devido à um TIMEOUT na requisição`);
+                          estoqueProduto = '0';
+                        }
+                      })
+                      .then(async() =>{
+                        await atualizarProduto(descProduto, null, estoqueProduto, custoProduto, idTray);
+                      })
+                    }
+                    else{
+                      produtosModificados++;
+                    }
+                  }
+                } else {
+                  if (exclusaoProduto == "1") {
+                    gravarLog(`Produto não cadastrado pois se encontra deletado, id ${idProduto}`);
+                  } else if (exclusaoProduto == "0") {
+                    await retProdutoEstoque(idProduto)
+                      .then(async sucess => {
+                        if (sucess == 1) {
+                          await getEstoqueXml(idProduto)
+                            .then(response => {
+                              estoqueProduto = response;
+                            })
+                            .catch((_) => { gravarLogErro('Deu erro aqui 1') })
+                        }
+                        else {
+                          gravarLogErro(`Estoque do produto ${idProduto} foi zerado devido à um TIMEOUT na requisição`);
+                          estoqueProduto = '0';
+                        }
+                      })
+                      .then(async () => {
+                        await cadastrarProduto(descProduto, estoqueProduto, custoProduto)
+                          .then(id => {
+                            dados.produtos[idProduto] = id;
+                            produtosCadastrados++;
+                            gravarLog(`Produto ${descProduto} cadastrado, ${idProduto} -> ${id}`);
+                          })
+                      })
+                  }
+                }
+                fs.writeFileSync('./src/build/produtos.json', JSON.stringify(dados));
+              })
+              .catch((_) => {
+                gravarLogErro(_)
+              })
+          mensagemRetorno = `Sincronização concluída. ${numeroCadastros} recebidos. ${produtosCadastrados} produtos cadastrados. ${produtosDeletados} produtos deletados. ${produtosModificados} já cadastrados antes.`;
+          resolve();     
+        }
+        }
+    } catch (err) {
+      reject(err);
+      gravarLogErro(err);
     }
-    
-  } catch (err) {
-    console.error(err);
-  }
+  });
 }
 
 
-async function atualizarEstoque(){
+async function atualizarEstoque() {
   return new Promise(async (resolve, reject) => {
+    refreshToken();
     try {
       const dados = JSON.parse(fs.readFileSync('./src/build/produtos.json', 'utf8'));
       let numeroProdutos = Object.keys(dados.produtos).length;;
       let chaves = Object.keys(dados.produtos);
       let estoqueProduto = 0;
 
-      for(let i=0; i<numeroProdutos; i++){
-        let idSaurus = chaves[i];
-        let idTray = dados.produtos[idSaurus];
-        console.log(`Estou na ${i} leitura. | Id Saurus: ${idSaurus} | Id Tray: ${idTray} |`);
-        await retProdutoEstoque(idSaurus)
+      for (let i = 0; i < numeroProdutos; i++) {
+        await VerificaAutorizarAcesso()
         .then(async () => {
-          await getEstoqueXml(idSaurus)
-          .then(response => {
-            estoqueProduto = response;
-          })
-          .then(async () => {
-            let id = parseInt(idTray);
-            await atualizarProduto(null, null, estoqueProduto, null, id);
-          })
-          .catch((_) => { console.log(_) })
+          let idSaurus = chaves[i];
+          let idTray = dados.produtos[idSaurus];
+          await retProdutoEstoque(idSaurus)
+            .then(async () => {
+              await getEstoqueXml(idSaurus)
+                .then(response => {
+                  estoqueProduto = response;
+                })
+                .then(async () => {
+                  let id = parseInt(idTray);
+                  await atualizarProduto(null, null, estoqueProduto, null, id);
+                  gravarLog(`Atualizado estoque do produto de idTray: ${idTray}`);
+                })
+                .catch((_) => { console.log(_) })
+            })
+            .catch((err) => { console.err(err) });
         })
-        .catch((err) => { console.err(err) });
       }
-      resolve();
+      resolve('Estoque dos produtos foram atualizados com sucesso');
     } catch (error) {
-      reject(error)
+      reject('Não foi possível atualizar o estoque, entre em contato com desenvolvimento');
+      gravarLogErro(error);
     }
   })
+}
+
+
+function VerificaAutorizarAcesso() {
+  return new Promise(async (resolve, reject) => {
+    try {
+
+      let data_expiraAcess = await retornaCampo('expira_acessToken');
+      let data_expiraRefresh = await retornaCampo('expira_refreshToken');
+
+      let dataAcess = new Date(data_expiraAcess);
+      let dataRefresh = new Date(data_expiraRefresh);
+
+      let dataAtual = new Date();
+
+      if (dataAcess < dataAtual) {
+        if (dataRefresh < dataAtual) {
+          await createToken()
+          .then(() => {
+            gravarLog('Access Token Criado');
+            setTimeout(() => {
+              resolve();
+            })
+          })
+        } else {
+          await refreshToken()
+          .then(() => {
+            gravarLog('Access Token Atualizado');
+            setTimeout(() => {
+              resolve();
+            }, 5000)
+          })
+        }
+      }
+      else{
+        resolve();
+      }
+
+    } catch (error) {
+      reject(error); // Rejecting the promise with the error
+      gravarLogErro(error);
+    }
+  });
 }
 
 
@@ -425,17 +533,29 @@ function autorizarAcesso(retCadastrosResult) {
 
       if (dataAcess < dataAtual) {
         if (dataRefresh < dataAtual) {
-          await createToken();
-          console.log('Access Token Criado');
+          await createToken()
+          .then(() => {
+            gravarLog('Access Token Criado');
+            setTimeout(() => {
+              resolve();
+            }, 5000);
+          })
         } else {
-          await refreshToken();
-          console.log('Access Token Atualizado');
+          await refreshToken()
+          .then(() => {
+            gravarLog('Access Token Atualizado');
+            setTimeout(() => {
+              resolve();
+            }, 5000);
+          })
         }
       }
-
-      resolve(); 
+      else{
+        resolve();
+      }
     } catch (error) {
       reject(error); // Rejecting the promise with the error
+      gravarLogErro(error);
     }
   });
 }
@@ -450,32 +570,35 @@ async function uploadPreco() {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
 
-    if((xmlDoc.getElementsByTagName('tbProdutoPrecos')) != undefined){
+    if ((xmlDoc.getElementsByTagName('tbProdutoPrecos')) != undefined) {
       const table = xmlDoc.getElementsByTagName('tbProdutoPrecos')[0];
       let precos = table.getElementsByTagName('row');
 
       for (let i = 0; i < precos.length; i++) {
-        let precoLeitura = precos[i];
-        let idSaurus = precoLeitura.getAttribute('pro_idProduto');
-        let idTray = dados.produtos[idSaurus];
-        let preco = precoLeitura.getAttribute('pro_vPreco');
-        let precoNumber = parseFloat(preco);
-        let valorFixado = precoNumber.toFixed(2);
-
-        if(dados.produtos[idSaurus]){
-          atualizarProduto(null, valorFixado, null, null, idTray)
-          .then(() => {
-            console.log('Preco Cadastrado');
-          })
-          .catch((_) => {
-            console.log(_);
-            console.log('Erro ao cadastrar preco');
-          })
-        }
-
+        await VerificaAutorizarAcesso()
+        .then(() => {
+          let precoLeitura = precos[i];
+          let idSaurus = precoLeitura.getAttribute('pro_idProduto');
+          let idTray = dados.produtos[idSaurus];
+          let preco = precoLeitura.getAttribute('pro_vPreco');
+          let precoNumber = parseFloat(preco);
+          let valorFixado = precoNumber.toFixed(2);
+  
+          if (dados.produtos[idSaurus]) {
+            atualizarProduto(null, valorFixado, null, null, idTray)
+              .then(() => {
+                gravarLog(`Preco ${valorFixado} Cadastrado no id ${idTray} com sucesso`);
+              })
+              .catch((_) => {
+                gravarLogErro(_);
+                gravarLogErro(`Erro ao cadastrar preco do id ${idTray}`);
+              })
+          }
+        })
+  
       }
     }
-    
+    resolve();
   });
 }
 
@@ -488,27 +611,30 @@ async function uploadImages() {
 
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+    const table = xmlDoc.getElementsByTagName('tbProdutoImagens')[0];
 
-    if((xmlDoc.getElementsByTagName('tbProdutoImagens')) != undefined){
-      const table = xmlDoc.getElementsByTagName('tbProdutoImagens')[0];
+    if (table != undefined) {
       let imagens = table.getElementsByTagName('row');
 
       for (let i = 0; i < imagens.length; i++) {
-        let imageLeitura = imagens[i];
-        let idSaurus = imageLeitura.getAttribute('pro_idProduto');
-        let idTray = dados.produtos[idSaurus];
-        let imagemURL = imageLeitura.getAttribute('pro_localImagem');
-        cadastrarImagem(idTray, imagemURL)
+        await VerificaAutorizarAcesso()
         .then(() => {
-          console.log('Imagem Cadastrada');
-        })
-        .catch((_) => {
-          console.log('Erro ao cadastrar imagem');
+          let imageLeitura = imagens[i];
+          let idSaurus = imageLeitura.getAttribute('pro_idProduto');
+          let idTray = dados.produtos[idSaurus];
+          let imagemURL = imageLeitura.getAttribute('pro_localImagem');
+          cadastrarImagem(idTray, imagemURL)
+            .then(() => {
+              gravarLog(`Imagem ${imagemURL} foi cadastrada no id ${idTray} com sucesso`);
+            })
+            .catch((_) => {
+              gravarLogErro(`Erro ao cadastrar imagem ${imagemURL} no id ${idTray}`);
+            })
         })
       }
-      resolve();
+
     }
-    
+    resolve();
   });
 }
 
@@ -517,9 +643,20 @@ async function uploadImages() {
  * Função para definir horário a ser usado na requisição e chamar função para realizar o consumo da API
  * @param {*} data parametro referente ao horário a ser usado na requisição
  */
-function sincronizacaoUnica(data){
-    getData(data);
-    reqCadastros(2);
+async function sincronizacaoUnica(data) {
+  return new Promise(async (resolve, reject) => {
+    sincUnica = 1;
+    await getData(data)
+    .then(async() => {
+      await reqCadastros('1');
+    })
+    .then(() => {
+      resolve(mensagemRetorno);
+    })
+    .catch((erro) => {
+      reject(erro);
+    })
+  })
 }
 
 
@@ -527,26 +664,73 @@ function sincronizacaoUnica(data){
  * Função para definir horário a ser usado na requisição e chamar função para realizar o consumo da API
  * @param {*} data parametro referente ao horário a ser usado na requisição
  */
-async function sincronizacaoContinua(data){
-  await getTimerJSON()
-  .then(() => {
-    getData(data);
-    reqCadastros(1);
-    setInterval(async function() {
-      await setDate()
+async function sincronizacaoContinua(data) {
+  return new Promise(async (resolve, reject) => {
+    await getTimerJSON()
       .then(() => {
-        reqCadastros(1);
+        sincUnica = 0;
       })
-      .catch((err) => { console.log('Erro') });
-    }, ((minutos*60)+segundos)*1000);
-  }) 
+      .then(() => {
+        getData(data);
+        return reqCadastros('1')
+      })
+      .then(() => {
+        setInterval(async function () {
+          await setDate()
+            .then((response) => {
+              console.log(`Tempo lido ${minutos}:${segundos} ----- ${response}`);
+              reqCadastros('1');
+            })
+            .catch((err) => { throw new Error('Verifique as informações cadastradas, se estão preenchidas corretamente. Caso esteja tudo de acordo, entre em contato com o desenvolvimento para averiguar.'); });
+        }, ((minutos * 60) + segundos) * 1000);
+      })
+      .catch(erro => {    //LINHA 686
+        reject(erro);
+      })
+  })
 }
 
 
+function gravarLog(mensagem) {
+  const data = new Date();
+  data.setHours(data.getHours() - 3);
+  const dataFormatada = `${data.getFullYear()}-${data.getMonth() + 1}-${data.getDate()}`;
+  const logMessage = `[${data.toISOString()}]: ${mensagem}\n`;
+  const logFileName = `../../../logs/log_${dataFormatada}.txt`;
+  const logFilePath = path.join(__dirname, logFileName);
+
+  fs.appendFile(logFilePath, logMessage, (err) => {
+    if (err) {
+      console.error('Erro ao gravar o log:', err);
+    } else {
+      console.log('Log gravado com sucesso!');
+    }
+  });
+}
+
+function gravarLogErro(mensagem) {
+  const data = new Date();
+  data.setHours(data.getHours() - 3);
+  const dataFormatada = `${data.getFullYear()}-${data.getMonth() + 1}-${data.getDate()}`;
+  const logMessage = `[${data.toISOString()}]: ${mensagem}\n`;
+  const logFileName = `../../../logs/logsErr/log_${dataFormatada}Err.txt`;
+  const logFilePath = path.join(__dirname, logFileName);
+
+  fs.appendFile(logFilePath, logMessage, (err) => {
+    if (err) {
+      console.error('Erro ao gravar o log:', err);
+    } else {
+      console.log('Log gravado com sucesso!');
+    }
+  });
+}
 
 module.exports = {
-  setDate, 
+  setDate,
   setSenha,
   sincronizacaoUnica,
-  sincronizacaoContinua
+  sincronizacaoContinua,
+  atualizarEstoque
 };
+
+

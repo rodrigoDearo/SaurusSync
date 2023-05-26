@@ -5,15 +5,15 @@
       "dominio": "testesdrsistema"
     },
     "geral": {
-      "timer": "16:00",
-      "ultimo_file": "cadastros-2023-05-18 09-45.xml"
+      "timer": "60:00",
+      "ultimo_file": "cadastros-2023-05-25 21-20.xml"
     },
     "tray": {
       "code": "dca5f05b40953367511bafc9cf7cc1f54a69ba6179b1078b55626d4323b6dbe1",
-      "access_token": "APP_ID-5005-STORE_ID-391250-9575cc8180e195978f8e26430586b99fd838c420342c4e8dc22250b61438eeff",
-      "refresh_token": "1f238dfb1596250354af9b39e67a07d1fa22b86c816190e222be4898914a012b",
-      "date_expiration_access_token": "2023-05-18 09:58:11",
-      "date_expiration_refresh_token": "2023-06-17 06:58:11",
+      "access_token": "APP_ID-5005-STORE_ID-391250-ccc7928faeafc04d32eb32c4bb2e6dbfd8762ecac1793423a3db8b4f3e17cbea",
+      "refresh_token": "7567e11803a50f53617f4a401d4d1a98bd26f82eec37f5d9f9ed51117669e31c",
+      "date_expiration_access_token": "2023-05-26 11:54:10",
+      "date_expiration_refresh_token": "2023-06-25 08:54:10",
       "url": "https://391250.commercesuite.com.br/web_api"
     }
   }

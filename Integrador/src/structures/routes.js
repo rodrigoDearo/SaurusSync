@@ -1,23 +1,69 @@
-/**
- * 
- */
+const createCustomAlert = (message, status) => {
+    // Cria um elemento de alerta personalizado
+    const alertElement = document.createElement('div');
+    alertElement.classList.add('custom-alert');
+    alertElement.textContent = message;
+  
+    // Define a posição absoluta do alerta
+    if(status == 'success'){
+        alertElement.style.backgroundColor = '#d4edda';
+        alertElement.style.color = '#155724';
+        alertElement.style.border = '1px solid #c3e6cb';  
+    }  
+    else if(status == 'warning'){
+        alertElement.style.backgroundColor = '#fff3cd';
+        alertElement.style.color = '#856404';
+        alertElement.style.border = '1px solid #ffeeba';  
+    }
+    else if(status == 'danger'){
+        alertElement.style.backgroundColor = '#f8d7da';
+        alertElement.style.color = '#721c24';
+        alertElement.style.border = '1px solid #f5c6cb';  
+    }
+
+    // Adiciona o alerta ao corpo da página
+    document.body.appendChild(alertElement);
+  
+    // Define um tempo para remover o alerta após alguns segundos
+    setTimeout(() => {
+      alertElement.remove();
+    }, 7000); // Remove o alerta após 5 segundos (ajuste conforme necessário)
+};
+
+
 function sincronizacaoUnica() {
     let datetimeInput = document.getElementById('datetime-input').value;
     let datetimeValue = new Date(datetimeInput);
     let dateTimeNow = new Date();
 
-    if(dateTimeNow.getTime() - datetimeValue.getTime() >= 30 * 60 * 1000){
+    if(dateTimeNow.getTime() - datetimeValue.getTime() >= 60 * 60 * 1000){
+        const elements = document.getElementsByClassName('sync');
+        document.getElementById('gif-loading').src = "../build/loading.gif";
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].disabled = true;
+        }
         fetch(`http://localhost:3000/sincronizacaoUnica/${datetimeInput}`)
         .then(response => response.text())
         .then(data => {
-            console.log(data);
+            document.getElementById('gif-loading').src = "";
+            if(data=='Verifique as informações cadastradas, se estão preenchidas corretamente. Caso esteja tudo de acordo entre em contato com desenvolvimento para averiguar'){
+                createCustomAlert(data, 'danger');
+            }
+            else{
+                createCustomAlert(data, 'success');
+            }
+        })
+        .then(() => {
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].disabled = false;
+            }
         })
         .catch(error => {
-            console.error(error);
+            createCustomAlert(error.text(), 'danger');
         });
     }
     else{
-        alert('Favor, insira um horário com 30 minutos ou mais de antecedência ao horário atual');
+        createCustomAlert('Favor, insira um horário com 1 hora ou mais de antecedência ao horário atual', 'warning');
     }
 }
 
@@ -37,16 +83,23 @@ function sincronizacaoContinua(){
         sincronizar = true;
     }
     else{
-        sincronizar = confirm('Caso tenha inserido/modificado/deletado algum produto nos últimos 30 minutos, essa modificação não será carregada. Deseja prosseguir ou voltar e inserir um horário inicial maior?');
+        sincronizar = confirm('Caso tenha inserido/modificado/deletado algum produto nos últimos 30 minutos, essa modificação não será carregada. Deseja prosseguir?')
     }
 
     if(sincronizar==true){
-        document.getElementById("botaoSincCont").disabled = true;
-        document.getElementById("botaoSincUn").disabled = true;
+        const elements = document.getElementsByClassName('sync');
+        document.getElementById('gif-loading').src = "../build/loading.gif";
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].disabled = true;
+        }
         fetch(`http://localhost:3000/sincronizacaoContinua/${datetimeInput}`)
             .then(response => response.text())
             .then(data => {
-                console.log(data);
+                createCustomAlert(data, 'danger');
+                document.getElementById('gif-loading').src = "";
+                for (let i = 0; i < elements.length; i++) {
+                    elements[i].disabled = false;
+                }
             })
             .catch(error => {
                 console.error(error);
@@ -57,6 +110,28 @@ function sincronizacaoContinua(){
     }
 }
 
+
+function atualizarEstoque(){
+    const elements = document.getElementsByClassName('sync');
+    document.getElementById('gif-loading').src = "../build/loading.gif";
+    for (let i = 0; i < elements.length; i++) {
+        elements[i].disabled = true;
+    }
+    fetch(`http://localhost:3000/atualizarEstoque`)
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('gif-loading').src = "";
+        createCustomAlert(data, 'success');
+    })
+    .then(() => {
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error(error);
+    });
+}
 
 /**
  * Função que faz requisição para porta 3000 para fechamento ao app Electron.js
@@ -79,15 +154,11 @@ function closeApp() {
 function saveSaurus(){
     let chave = document.getElementById('chaveCaixa-input').value;
     let dominio = document.getElementById('dominio-input').value;
-
+    
     fetch(`http://localhost:3000/saveSaurus/${chave}/${dominio}`)
     .then(response => response.text())
     .then(data =>{
-        console.log('Fetch concluido');
-        console.log(data);
-    })
-    .then(() => {
-        alert('DADOS ATUALIZADOS COM SUCESSO');
+        createCustomAlert(data, 'success');
     })
     .catch(error =>{
         confirm.log(error);
@@ -102,14 +173,11 @@ function saveTray(){
     let code = document.getElementById('code-input').value;
     let url = document.getElementById('url-input').value;
 
+    document.getElementById('gif-loading').src = "../build/loading.gif";
     fetch(`http://localhost:3000/saveTray/${code}/${url}`)
     .then(response => response.text())
     .then(data =>{
-        console.log('Fetch concluido');
-        console.log(data);
-    })
-    .then(() => {
-        alert('DADOS ATUALIZADOS COM SUCESSO');
+        createCustomAlert(data, 'success');
     })
     .catch(error =>{
         confirm.log(error);
@@ -125,19 +193,15 @@ function saveGeral(){
     let time = timerInput.split(":");
     let segundos = (+time[0]) * 60 + (+time[1]);
 
-    if(segundos < 1800){
-        alert('Favor, insira um timer de requisição superior a 30 minutos;')
+    if(segundos < 3600){
+        alert('Favor, insira um timer de requisição superior a 1 hora;')
     }
     else{
         
         fetch(`http://localhost:3000/saveGeral/${timerInput}`)
         .then(response => response.text())
         .then(data =>{
-            console.log('Fetch concluido');
-            console.log(data);
-        })
-        .then(() =>{
-            alert('TIMER ATUALIZADO COM SUCESSO!')
+            createCustomAlert(data, 'success');
         })
         .catch(error =>{
             confirm.log(error);
@@ -202,4 +266,3 @@ window.onload = function(){
     carregarInfoTray();
 };
 
-carregarData();
