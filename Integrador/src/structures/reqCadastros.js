@@ -1,7 +1,7 @@
 /* ---------------------- IMPORTAÇÃO DE MÓDULOS ----------------------*/
 const { codificarInBase64, decodificarEsalvar, decodificarEsalvarEstoque } = require('./tratamentoDados');
 const { retornaCampo } = require('./manipulacaoJSON');
-const { createToken, refreshToken, cadastrarProduto, atualizarProduto, deletarProduto, cadastrarImagem } = require('./configTray');
+const { createToken, refreshToken, cadastrarProduto, atualizarProduto, deletarProduto, cadastrarImagem, criarCategoria } = require('./configTray');
 const axios = require('axios');
 const xml2js = require('xml2js');
 const fs = require('fs');
@@ -323,6 +323,31 @@ async function getEstoqueXml(id) {
 }
 
 
+async function setCategoria(name){
+  let idCategoria;
+  return new Promise(async (resolve, reject) => {
+    try {
+      const dados = JSON.parse(fs.readFileSync('./src/build/categoria.json', 'utf8'));
+
+      if(dados.categorias[name]){
+        idCategoria = dados.categorias[name];
+      }
+      else{
+        await criarCategoria(name)
+        .then(response => {
+          dados.categorias[name] = response;
+          gravarLog(`Criado categoria ${name} -> ${response}`);
+          resolve(response);
+        })
+      }
+
+      fs.writeFileSync('./src/build/categoria.json', JSON.stringify(dados));
+      resolve(idCategoria)
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
 
 
 async function wsCadastro() {
@@ -353,6 +378,15 @@ async function wsCadastro() {
                 let descProduto = rows[i].getAttribute('pro_descProduto');
                 let custoProduto = rows[i].getAttribute('pro_vCompra');
                 let estoqueProduto = 0;
+
+                let nameCategoria = rows[i].getAttribute('pro_descCategoria');
+                let idCategoria = "";
+                if(nameCategoria != "Sem Categoria"){
+                  await setCategoria(nameCategoria)
+                  .then(response => {
+                    idCategoria = response;
+                  })
+                }
   
                 const dados = JSON.parse(fs.readFileSync('./src/build/produtos.json', 'utf8'));
                 if (dados.produtos[idProduto]) {
@@ -388,7 +422,7 @@ async function wsCadastro() {
                         }
                       })
                       .then(async() =>{
-                        await atualizarProduto(descProduto, null, estoqueProduto, custoProduto, null, idTray);
+                        await atualizarProduto(descProduto, null, estoqueProduto, custoProduto, idCategoria, null, idTray);
                       })
                     }
                     else{
@@ -414,7 +448,7 @@ async function wsCadastro() {
                         }
                       })
                       .then(async () => {
-                        await cadastrarProduto(descProduto, estoqueProduto, custoProduto)
+                        await cadastrarProduto(descProduto, estoqueProduto, custoProduto, idCategoria)
                           .then(id => {
                             dados.produtos[idProduto] = id;
                             produtosCadastrados++;
@@ -462,7 +496,7 @@ async function atualizarEstoque() {
                 })
                 .then(async () => {
                   let id = parseInt(idTray);
-                  await atualizarProduto(null, null, estoqueProduto, null, null, id);
+                  await atualizarProduto(null, null, estoqueProduto, null, null, null, id);
                   gravarLog(`Atualizado estoque do produto de idTray: ${idTray}`);
                 })
                 .catch((_) => { console.log(_) })
@@ -610,7 +644,7 @@ async function uploadPreco() {
           let valorFixado = precoNumber.toFixed(2);
   
           if (dados.produtos[idSaurus] && tabPreco=="1") {
-            atualizarProduto(null, valorFixado, null, null, null, idTray)
+            atualizarProduto(null, valorFixado, null, null, null, null, idTray)
               .then(() => {
                 gravarLog(`Preco ${valorFixado} Cadastrado no id ${idTray} com sucesso`);
               })
@@ -690,7 +724,7 @@ async function uploadCodigos() {
           let codigo = codigoLeitura.getAttribute('pro_codProduto');
   
           if (dados.produtos[idSaurus]) {
-            atualizarProduto(null, null, null, null, codigo, idTray)
+            atualizarProduto(null, null, null, null, null, codigo, idTray)
               .then(() => {
                 gravarLog(`Codigo ${codigo} Cadastrado no id ${idTray} com sucesso`);
               })
@@ -814,4 +848,5 @@ module.exports = {
   sincronizacaoUnica,
   sincronizacaoContinua,
   atualizarEstoque,
+  setCategoria
 };
