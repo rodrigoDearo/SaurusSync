@@ -17,7 +17,11 @@
             </button>
             
             <h2 class="titulo">Configuração Geral</h2>
-            <button class='btn btn-close btn-outline-light' id="botaoCloseApp" onclick="closeApp()"></button>
+            
+            <div class="buttons">
+                <button type="button" class="btn-minimize btn-outline-light" id="minimizeApp" onclick="minimizeApp()" aria-label="Minimize"></button>
+                <button class='btn btn-close btn-outline-light' id="botaoCloseApp" onclick="closeApp()"></button>
+            </div>
         </div>
     </nav>
 
@@ -33,7 +37,6 @@
                 <a href="configSaurus.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Configurações Saurus</button></a>
                 <a href="configTray.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Configurações Tray</button></a>
                 <a href="#" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Configurações Gerais</button></a>
-                <a href="consultStatus.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Consultar Status</button></a>
                 <a href="startSync.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Sincronizar</button></a>
               </div>
         </div>
@@ -41,8 +44,8 @@
 
     <form class="container-fluid col-8" id="formularioFull">
         <div class="mb-3" id="last-input">
-            <label class="form-label">Timer</label>
-            <input type="time" id="timer-input" class="form-control input-text" required>
+            <label class="form-label">Timer | minutos:segundos |</label>
+            <input type="text" id="timer-input" class="form-control input-text" required>
         </div>
         <button type="submit" onclick="saveGeral()" class="btn btn-primary container botao-save">Salvar</button>
     </form>

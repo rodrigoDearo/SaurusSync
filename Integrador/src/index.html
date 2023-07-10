@@ -16,8 +16,13 @@
                 <span class="navbar-toggler-icon" id="button_menu_icon"></span>
             </button>
 
-            <h2 class="titulo">SAURUS SYNC</h2> 
-            <button class='btn btn-close btn-outline-light' id="botaoCloseApp" onclick="closeApp()"></button>
+            <h2 class="titulo">Pagina Inicial</h2> 
+
+            <div class="buttons">
+                <button type="button" class="btn-minimize btn-outline-light" id="minimizeApp" onclick="minimizeApp()" aria-label="Minimize"></button>
+                <button class='btn btn-close btn-outline-light' id="botaoCloseApp" onclick="closeApp()"></button>
+            </div>
+
         </div>
     </nav>
 
@@ -33,12 +38,27 @@
                 <a href="pages/configSaurus.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Configurações Saurus</button></a>
                 <a href="pages/configTray.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Configurações Tray</button></a>
                 <a href="pages/configGeral.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Configurações Gerais</button></a>
-                <a href="pages/consultStatus.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Consultar Status</button></a>
                 <a href="pages/startSync.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Sincronizar</button></a>
               </div>
         </div>
     </div>
 
+    <div class="containerInicialPage">
+        <img src="./build/icon.jpg" class="imagemInicial">
+            
+        <p class="description" id="textInicial">
+            SAURUS => TRAY
+            <br>
+            <br>Sincronize Produtos
+            <br>Sincronize Preço
+            <br>Sincronize Custo
+            <br>Sincronize Estoque
+        </p>
+    </div>
+
+    <footer>
+        <p>DrSistemas | Desenvolvido por Rodrigo Dearo | @Github <a href="https://github.com/rodrigoDearo" target="_blank">rodrigoDearo</a> </p>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="./main.js" type="module"></script>

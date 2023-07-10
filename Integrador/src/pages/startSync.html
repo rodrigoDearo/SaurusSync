@@ -9,15 +9,21 @@
     <link rel="stylesheet" type="text/css" href="../files_front/style.css">
 </head>
 <body>
+    <img src="" id="gif-loading" type="gif"> 
 
+    
     <nav class="navbar" id="navbar_menu">
         <div class="container-fluid">
-            <button class="btn btn-primary" id="button_menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+            <button class="btn btn-primary sync" id="button_menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
                 <span class="navbar-toggler-icon" id="button_menu_icon"></span>
             </button>
             
-            <h2 class="titulo">Configuração Geral</h2>
-            <button class='btn btn-close btn-outline-light' id="botaoCloseApp" onclick="closeApp()"></button>
+            <h2 class="titulo">Sincronização</h2>
+            
+            <div class="buttons">
+                <button type="button" class="btn-minimize btn-outline-light" id="minimizeApp" onclick="minimizeApp()" aria-label="Minimize"></button>
+                <button class='btn btn-close btn-outline-light' id="botaoCloseApp" onclick="closeApp()"></button>
+            </div>
         </div>
     </nav>
 
@@ -30,11 +36,10 @@
 
         <div class="offcanvas-body menu">
             <div class="btn-group-vertical container-fluid" role="group" aria-label="Vertical button group">
-                <a href="configSaurus.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Configurações Saurus</button></a>
-                <a href="configTray.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Configurações Tray</button></a>
-                <a href="configGeral.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Configurações Gerais</button></a>
-                <a href="consultStatus.html" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Consultar Status</button></a>
-                <a href="#" class="container-fluid"><button type="button" class="btn btn-secondary container-fluid button_menu">Sincronizar</button></a>
+                <a href="configSaurus.html" class="container-fluid"><button type="button" class="btn sync btn-secondary container-fluid button_menu">Configurações Saurus</button></a>
+                <a href="configTray.html" class="container-fluid"><button type="button" class="btn sync btn-secondary container-fluid button_menu">Configurações Tray</button></a>
+                <a href="configGeral.html" class="container-fluid"><button type="button" class="btn sync btn-secondary container-fluid button_menu">Configurações Gerais</button></a>
+                <a href="#" class="container-fluid"><button type="button" class="btn btn-secondary sync container-fluid button_menu">Sincronizar</button></a>
               </div>
         </div>
     </div>
@@ -42,10 +47,11 @@
     <form class="container-fluid col-8" id="formularioFull">
         <div class="mb-3" id="last-input">
             <label class="form-label">Data/Horário</label>
-            <input type="datetime-local" id="datetime-input" class="form-control input-text" required>
+            <input type="datetime-local" id="datetime-input" class="form-control sync input-text" required>
         </div>
-        <button type="button" id="botaoSincUn" onclick="sincronizacaoUnica()" class="btn btn-primary container botao-save mb-3">Carga Única</button>
-        <button type="button" id="botaoSincCont" onclick="sincronizacaoContinua()" class="btn btn-primary container botao-save">Carga Automática</button>
+        <button type="button" id="botaoSincUn" onclick="sincronizacaoUnica()" class="btn btn-primary sync container botao-save mb-3">Carga Única</button>
+        <button type="button" id="botaoSincCont" onclick="sincronizacaoContinua()" class="btn btn-primary sync container botao-save mb-3">Carga Automática</button>
+        <button type="button" id="botaoSincCont" onclick="atualizarEstoque()" class="btn btn-primary sync container botao-save">Atualizar Estoque</button>
     </form>
 
 
