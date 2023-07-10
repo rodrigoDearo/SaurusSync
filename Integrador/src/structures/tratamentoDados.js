@@ -55,6 +55,10 @@ function criarEziparArquivoXml(){
         await salvarDados(fileName, null, null, 'geral_file');
         const readStream = stream.Readable.from(result); // Cria um stream de leitura a partir dos dados descompactados
 
+        if (!fs.existsSync('../GravacaoXML')) {
+          fs.mkdirSync('../GravacaoXML');
+        }
+
         readStream.pipe(fs.createWriteStream(`../GravacaoXML/${fileName}`)) // Grava os dados em um arquivo
           .on('error', function(err) {
             reject(err);
@@ -79,6 +83,10 @@ function criarEziparArquivoXml(){
         fileName = `cadastros-${id}.xml`;
   
         const readStream = stream.Readable.from(result); // Cria um stream de leitura a partir dos dados descompactados
+
+        if (!fs.existsSync('../GravacaoXMLprodutoEstoque')) {
+          fs.mkdirSync('../GravacaoXMLprodutoEstoque');
+        }
 
         readStream.pipe(fs.createWriteStream(`../GravacaoXMLprodutoEstoque/${fileName}`)) // Grava os dados em um arquivo
           .on('error', function(err) {

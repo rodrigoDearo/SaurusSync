@@ -765,13 +765,15 @@ async function sincronizacaoContinua(data) {
 
 
 function gravarLog(mensagem) {
+  if (!fs.existsSync('../logs')) {
+    fs.mkdirSync('../logs');
+  }
   const data = new Date();
   data.setHours(data.getHours() - 3);
   const dataFormatada = `${data.getFullYear()}-${data.getMonth() + 1}-${data.getDate()}`;
   const logMessage = `[${data.toISOString()}]: ${mensagem}\n`;
   const logFileName = `../../../logs/log_${dataFormatada}.txt`;
   const logFilePath = path.join(__dirname, logFileName);
-
   fs.appendFile(logFilePath, logMessage, (err) => {
     if (err) {
       console.error('Erro ao gravar o log:', err);
@@ -782,6 +784,14 @@ function gravarLog(mensagem) {
 }
 
 function gravarLogErro(mensagem) {
+  if (!fs.existsSync('../logs')) {
+    fs.mkdirSync('../logs');
+  }
+  
+  if (!fs.existsSync('../logs/logsErr')) {
+    fs.mkdirSync('../logs/logsErr');
+  }
+
   const data = new Date();
   data.setHours(data.getHours() - 3);
   const dataFormatada = `${data.getFullYear()}-${data.getMonth() + 1}-${data.getDate()}`;
@@ -803,7 +813,5 @@ module.exports = {
   setSenha,
   sincronizacaoUnica,
   sincronizacaoContinua,
-  atualizarEstoque
+  atualizarEstoque,
 };
-
-
