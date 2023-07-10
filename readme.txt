@@ -1,6 +1,6 @@
-						S A U R U S _ S Y N C - I N F O R M A Ç Õ E S _ S O B R E _ O _ P R O G R A M A
+	S A U R U S _ S Y N C - I N F O R M A Ç Õ E S _ S O B R E _ O _ P R O G R A M A
 
-______________________________________________________________________________________________________________________________________________________________________________
+____________________________________________________________________________________________________
 
 DADOS A SEREM INSERIDOS:
 
@@ -23,7 +23,7 @@ Timer: O timer deve ser inserido no seguinte padrão (miutos:segundos) (exemplo:
 Data/Horário: A partir de qual data/horário deverá ser feita a requisição. Exemplo: Caso seja inserio a data (01/05/2023 09:00) ao fazer a requisição única todos os produtos cadastrados e que não sofreram alteração anterior a data informada não será retornados no XML do webservice, logo não serão cadastrados. 
 
 
-______________________________________________________________________________________________________________________________________________________________________________
+____________________________________________________________________________________________________
 
 
 INDICAÇÕES:
@@ -37,7 +37,7 @@ Fazer backup com frequência do arquivo produtos.json
 ---------- RESUMO: APENAS USAR SINCRONIZAÇÃO ÚNICA PARA CARGA INICIAL, CONTÍNUA PARA ATUALIZAÇÕES E AO FIM DO DIA SINCRONIZAR ESTOQUE  ----------
 
 
-______________________________________________________________________________________________________________________________________________________________________________
+____________________________________________________________________________________________________
 
 
 OBSERVAÇÕES:
@@ -48,7 +48,7 @@ OBSERVAÇÕES:
 3- A Sincronização Única sincroniza o estoque, produtos, e preço. Sendo assim uma requisição mais pesada que se faz apenas uma vez. Ele deve ser usado como carga inicial, pois produtos alterados não serão alterados na tray. Apenas feito seu cadastro inicial. Mudanças são sincronizadas pela Sincronização Continua.
 
 
-______________________________________________________________________________________________________________________________________________________________________________
+____________________________________________________________________________________________________
 
 
 PASTAS E ARQUIVOS:
@@ -63,4 +63,4 @@ PASTAS E ARQUIVOS:
 
 .\Integrador\src\build\produtos.json: O arquivo de maior importância, seria o banco de dados do programa. O programa que relaciona o id Saurus ao id Tray, graças a este arquivo é possível fazer alterações nos produtos, não duplicar produtos. Caso este arquivo seja perdido, o estoque, base será completamente duplicado.
 
-______________________________________________________________________________________________________________________________________________________________________________
+____________________________________________________________________________________________________
