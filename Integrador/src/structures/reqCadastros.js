@@ -337,6 +337,7 @@ async function setCategoria(name){
         await criarCategoria(name)
         .then(response => {
           dados.categorias[name] = response;
+          fs.writeFileSync('./src/build/categoria.json', JSON.stringify(dados));
           gravarLog(`Criado categoria ${name} -> ${response}`);
           resolve(response);
         })
@@ -360,11 +361,17 @@ async function setSubCategoria(categoria, subCategoria){
         idSubcategoria = dados.subcategorias[subCategoria]
       }
       else{
+        let idCategoria;
         if(!dados.categorias[categoria]){
           await setCategoria(categoria)
+          .then(response => {
+            idCategoria = response;
+          })
+        }
+        else{
+          idCategoria = dados.categorias[categoria];
         }
 
-        let idCategoria = dados.categorias[categoria];
         await criarSubCategoria(subCategoria, idCategoria)
         .then(response => {
           dados.subcategorias[subCategoria] = response;
