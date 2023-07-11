@@ -291,6 +291,50 @@ async function criarCategoria(name){
 }
 
 
+async function criarSubCategoria(name, idFather){
+  return new Promise(async (resolve, reject) => {
+    try {
+      await leituraDosDados()
+      .then(() => {
+        const requestData = {
+          Category: {
+            name: name,
+            description: '',
+            slug: '',
+            order: '',
+            title: name,
+            small_description: '',
+            has_acceptance_term: '',
+            acceptance_term: '',
+            metatag: {
+              keywords: '',
+              description: '',
+            },
+            property: '',
+            parent_id: idFather
+          },
+        };
+    
+        axios.post(`${url}/categories?access_token=${acessToken}`, requestData, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${acessToken}`,
+          },
+        })
+          .then((response) => {
+            resolve(response.data.id);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      })
+
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
 
 async function deletarProduto(thisid) {
   try {
@@ -334,7 +378,8 @@ module.exports = {
     atualizarProduto,
     deletarProduto,
     cadastrarImagem,
-    criarCategoria
+    criarCategoria,
+    criarSubCategoria
 };
 
 //

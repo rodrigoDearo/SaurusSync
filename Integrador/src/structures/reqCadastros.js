@@ -1,7 +1,7 @@
 /* ---------------------- IMPORTAÇÃO DE MÓDULOS ----------------------*/
 const { codificarInBase64, decodificarEsalvar, decodificarEsalvarEstoque } = require('./tratamentoDados');
 const { retornaCampo } = require('./manipulacaoJSON');
-const { createToken, refreshToken, cadastrarProduto, atualizarProduto, deletarProduto, cadastrarImagem, criarCategoria } = require('./configTray');
+const { createToken, refreshToken, cadastrarProduto, atualizarProduto, deletarProduto, cadastrarImagem, criarCategoria, criarSubCategoria } = require('./configTray');
 const axios = require('axios');
 const xml2js = require('xml2js');
 const fs = require('fs');
@@ -192,7 +192,7 @@ function reqCadastros(Sync) {
               if (err) {
                 gravarLogErro(err);
               } else {
-
+  
                 if ((result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].xRetNumero[0]) == '1') {
                   reject('Verifique as informações cadastradas, se estão preenchidas corretamente. Caso esteja tudo de acordo entre em contato com desenvolvimento para averiguar');
                 } else {
@@ -227,7 +227,8 @@ function reqCadastros(Sync) {
             });
           })
           .catch((error) => {
-            gravarLogErro('Erro na requisição 2:', error);
+            gravarLogErro('TIMEOUT na requisição. Tempo limite para comunicação com WebService Saurus Excedido. Entrar em contato com suporte técnico!', error);
+            reject('TIMEOUT na requisição. Tempo limite para comunicação com WebService Saurus Excedido. Entrar em contato com suporte técnico!');
           });
       })
       .catch((error) => {
@@ -350,6 +351,37 @@ async function setCategoria(name){
 }
 
 
+async function setSubCategoria(categoria, subCategoria){
+  let idSubcategoria;
+  return new Promise(async (resolve, reject) => {
+    try {
+      const dados = JSON.parse(fs.readFileSync('./src/build/categoria.json', 'utf8'));
+      if(dados.subcategorias[subCategoria]){
+        idSubcategoria = dados.subcategorias[subCategoria]
+      }
+      else{
+        if(!dados.categorias[categoria]){
+          await setCategoria(categoria)
+        }
+
+        let idCategoria = dados.categorias[categoria];
+        await criarSubCategoria(subCategoria, idCategoria)
+        .then(response => {
+          dados.subcategorias[subCategoria] = response;
+          gravarLog(`Criado SubCategoria ${subCategoria} -> ${response} através da Categoria pai ${categoria} -> ${idCategoria}`);
+          resolve(response);
+        })
+      }
+
+      fs.writeFileSync('./src/build/categoria.json', JSON.stringify(dados));
+      resolve(idSubcategoria)
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+
 async function wsCadastro() {
   return new Promise(async (resolve, reject) => {
     try {
@@ -381,8 +413,18 @@ async function wsCadastro() {
 
                 let nameCategoria = rows[i].getAttribute('pro_descCategoria');
                 let idCategoria = "";
-                if(nameCategoria != "Sem Categoria"){
-                  await setCategoria(nameCategoria)
+                let nameSubCategoria = rows[i].getAttribute('pro_descSubCategoria');
+
+                if(nameSubCategoria == "Sem Subcategoria"){
+                  if(nameCategoria != "Sem Categoria"){
+                    await setCategoria(nameCategoria)
+                    .then(response => {
+                      idCategoria = response;
+                    })
+                  }
+                }
+                else{
+                  await setSubCategoria(nameCategoria, nameSubCategoria)
                   .then(response => {
                     idCategoria = response;
                   })
