@@ -123,7 +123,7 @@ async function refreshToken(){
 }
 
 
-async function definirProduto(nome, estoque, precoCompra) {
+async function definirProduto(nome, estoque, precoCompra, categoria) {
   return new Promise((resolve, reject) => {
     try {
       const produto = {
@@ -144,7 +144,7 @@ async function definirProduto(nome, estoque, precoCompra) {
           "width": "",
           "height": "",
           "stock": `${estoque}`,
-          "category_id": "",
+          "category_id": `${categoria}`,
           "available": "1",
           "availability": "",
           "availability_days": "",
@@ -167,7 +167,7 @@ async function definirProduto(nome, estoque, precoCompra) {
 
 
 
-async function definirProdutoAtualizado(nome, preco, estoque, precoCompra, codigo) {
+async function definirProdutoAtualizado(nome, preco, estoque, precoCompra, categoria, codigo) {
   return new Promise((resolve, reject) => {
     try {
       let produto = {
@@ -196,6 +196,10 @@ async function definirProdutoAtualizado(nome, preco, estoque, precoCompra, codig
         produto.Product["ean"] = `${codigo}`
       }
 
+      if(categoria != null){
+        produto.Product["category_id"] = `${categoria}`
+      }
+
       resolve(produto);
     } catch (error) {
       reject(error);
@@ -204,11 +208,11 @@ async function definirProdutoAtualizado(nome, preco, estoque, precoCompra, codig
 }
 
 
-async function cadastrarProduto(thisnome, thisestoque, thisprecoCompra) {
+async function cadastrarProduto(thisnome, thisestoque, thisprecoCompra, thiscategoria) {
   return new Promise(async (resolve, reject) => {
     try {
       await leituraDosDados();
-      const produto = await definirProduto(thisnome, thisestoque, thisprecoCompra);
+      const produto = await definirProduto(thisnome, thisestoque, thisprecoCompra, thiscategoria);
       const response = await axios.post(`${url}/products?access_token=${acessToken}`, produto);
       const id = response.data.id
       resolve(id);
@@ -221,14 +225,14 @@ async function cadastrarProduto(thisnome, thisestoque, thisprecoCompra) {
 
 
 
-async function atualizarProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thisCodigo, thisid) {
+async function atualizarProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thiscategoria, thisCodigo, thisid) {
   try {
     let id;
     await leituraDosDados()
       .then(() => {
         id = thisid;
       })
-      .then(() => definirProdutoAtualizado(thisnome, thispreco, thisestoque, thisprecoCompra, thisCodigo))
+      .then(() => definirProdutoAtualizado(thisnome, thispreco, thisestoque, thisprecoCompra, thiscategoria, thisCodigo))
       .then(produtoAtualizado => {
         axios.put(`${url}/products/${id}?access_token=${acessToken}`, produtoAtualizado)
           .then(response => {
@@ -242,6 +246,94 @@ async function atualizarProduto(thisnome, thispreco, thisestoque, thisprecoCompr
   }
 }
 
+
+async function criarCategoria(name){
+  return new Promise(async (resolve, reject) => {
+    try {
+      await leituraDosDados()
+      .then(() => {
+        const requestData = {
+          Category: {
+            name: name,
+            description: '',
+            slug: '',
+            order: '',
+            title: name,
+            small_description: '',
+            has_acceptance_term: '',
+            acceptance_term: '',
+            metatag: {
+              keywords: '',
+              description: '',
+            },
+            property: '',
+          },
+        };
+    
+        axios.post(`${url}/categories?access_token=${acessToken}`, requestData, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${acessToken}`,
+          },
+        })
+          .then((response) => {
+            resolve(response.data.id);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      })
+
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+
+async function criarSubCategoria(name, idFather){
+  return new Promise(async (resolve, reject) => {
+    try {
+      await leituraDosDados()
+      .then(() => {
+        const requestData = {
+          Category: {
+            name: name,
+            description: '',
+            slug: '',
+            order: '',
+            title: name,
+            small_description: '',
+            has_acceptance_term: '',
+            acceptance_term: '',
+            metatag: {
+              keywords: '',
+              description: '',
+            },
+            property: '',
+            parent_id: idFather
+          },
+        };
+    
+        axios.post(`${url}/categories?access_token=${acessToken}`, requestData, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${acessToken}`,
+          },
+        })
+          .then((response) => {
+            resolve(response.data.id);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      })
+
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
 
 
 async function deletarProduto(thisid) {
@@ -285,20 +377,9 @@ module.exports = {
     cadastrarProduto,
     atualizarProduto,
     deletarProduto,
-    cadastrarImagem
+    cadastrarImagem,
+    criarCategoria,
+    criarSubCategoria
 };
 
-
-/*
-
-documentar codigo
-testes
-testar caso nao tenha pasta
-retirar categoria
-
-APP EM EXECUTAVEL---
-
-
-
-
-*/
+//

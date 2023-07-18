@@ -6,7 +6,6 @@ const { sincronizacaoUnica, sincronizacaoContinua, atualizarEstoque } = require(
 
 
 
-
 // ---------------------- EXPRESS JS ---------------------- //
 
 const expss = express();
@@ -30,7 +29,7 @@ expss.get('/atualizarEstoque', async (req, res) => {
     res.status(200).send(response);
   })
   .catch((error) => {
-    res.status(500).send('Erro na Sincronização Única: ' + error);
+    res.status(500).send(error);
   });
 })
 
@@ -169,4 +168,3 @@ expss.get('/sincronizacaoContinua/:data', (req, res) =>{
     res.status(500).send(error);
   });
 });
-

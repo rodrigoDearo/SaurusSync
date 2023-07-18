@@ -43,23 +43,27 @@ function sincronizacaoUnica() {
             elements[i].disabled = true;
         }
         fetch(`http://localhost:3000/sincronizacaoUnica/${datetimeInput}`)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('gif-loading').src = "";
-            if(data=='Verifique as informações cadastradas, se estão preenchidas corretamente. Caso esteja tudo de acordo entre em contato com desenvolvimento para averiguar'){
-                createCustomAlert(data, 'danger');
-            }
-            else{
+        .then(response => {
+            if (response.status === 200) {
+            return response.text().then(data => {
+                document.getElementById('gif-loading').src = "";
                 createCustomAlert(data, 'success');
+            });
+            } else {
+                document.getElementById('gif-loading').src = "";
+            return response.text().then(data => {
+                console.log(data);
+                createCustomAlert(data, 'danger');
+            });
             }
         })
         .then(() => {
             for (let i = 0; i < elements.length; i++) {
-                elements[i].disabled = false;
+            elements[i].disabled = false;
             }
         })
         .catch(error => {
-            createCustomAlert(error.text(), 'danger');
+            createCustomAlert(error, 'danger');
         });
     }
     else{

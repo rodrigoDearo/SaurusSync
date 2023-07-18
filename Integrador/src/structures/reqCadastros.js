@@ -1,7 +1,7 @@
 /* ---------------------- IMPORTAÇÃO DE MÓDULOS ----------------------*/
 const { codificarInBase64, decodificarEsalvar, decodificarEsalvarEstoque } = require('./tratamentoDados');
 const { retornaCampo } = require('./manipulacaoJSON');
-const { createToken, refreshToken, cadastrarProduto, atualizarProduto, deletarProduto, cadastrarImagem } = require('./configTray');
+const { createToken, refreshToken, cadastrarProduto, atualizarProduto, deletarProduto, cadastrarImagem, criarCategoria, criarSubCategoria } = require('./configTray');
 const axios = require('axios');
 const xml2js = require('xml2js');
 const fs = require('fs');
@@ -192,7 +192,7 @@ function reqCadastros(Sync) {
               if (err) {
                 gravarLogErro(err);
               } else {
-
+  
                 if ((result['soap:Envelope']['soap:Body'][0].retCadastrosResponse[0].xRetNumero[0]) == '1') {
                   reject('Verifique as informações cadastradas, se estão preenchidas corretamente. Caso esteja tudo de acordo entre em contato com desenvolvimento para averiguar');
                 } else {
@@ -227,7 +227,8 @@ function reqCadastros(Sync) {
             });
           })
           .catch((error) => {
-            gravarLogErro('Erro na requisição 2:', error);
+            gravarLogErro('TIMEOUT na requisição. Tempo limite para comunicação com WebService Saurus Excedido. Entrar em contato com suporte técnico!', error);
+            reject('TIMEOUT na requisição. Tempo limite para comunicação com WebService Saurus Excedido. Entrar em contato com suporte técnico!');
           });
       })
       .catch((error) => {
@@ -323,6 +324,82 @@ async function getEstoqueXml(id) {
 }
 
 
+async function setCategoria(name){
+  let idCategoria;
+  return new Promise(async (resolve, reject) => {
+    try {
+      const dados = JSON.parse(fs.readFileSync('./src/build/categoria.json', 'utf8'));
+
+      if(dados.categorias[name]){
+        idCategoria = dados.categorias[name].id;
+      }
+      else{
+        await criarCategoria(name)
+        .then(response => {
+          dados.categorias[name] = {
+            id: response,
+            subcategorias: {}
+          };
+          fs.writeFileSync('./src/build/categoria.json', JSON.stringify(dados));
+          gravarLog(`Criado categoria ${name} -> ${response}`);
+          resolve(response);
+        })
+      }
+
+      fs.writeFileSync('./src/build/categoria.json', JSON.stringify(dados));
+      resolve(idCategoria)
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+
+async function setSubCategoria(categoria, subCategoria) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const dados = JSON.parse(fs.readFileSync('./src/build/categoria.json', 'utf8'));
+      let idCategoria, idSubcategoria;
+
+      if (!dados.categorias[categoria]) {
+        try {
+          idCategoria = await setCategoria(categoria)
+        } catch (error) {
+          reject(error);
+          return;
+        }
+      } else {
+        idCategoria = dados.categorias[categoria].id;
+      }
+
+      const dadosNovos = JSON.parse(fs.readFileSync('./src/build/categoria.json', 'utf8'));
+
+      if(dadosNovos.categorias[categoria] == undefined){
+        gravarLogErro(`Indefinido esta no 1 ${idCategoria}`);
+      }
+      else if (dadosNovos.categorias[categoria].subcategorias[subCategoria]) {
+        idSubcategoria = dadosNovos.categorias[categoria].subcategorias[subCategoria];
+        resolve(idSubcategoria);
+      } else {
+        try {
+          const response = await criarSubCategoria(subCategoria, idCategoria);
+          dadosNovos.categorias[categoria].subcategorias[subCategoria] = response;
+          if(dadosNovos.categorias[categoria] == undefined){
+            gravarLogErro('Indefinido esta no 2');
+          }
+          fs.writeFileSync('./src/build/categoria.json', JSON.stringify(dados));
+          fs.writeFileSync('./src/build/categoria.json', JSON.stringify(dadosNovos));
+          resolve(response);
+        } catch (error) {
+          reject(error);
+        }
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
 
 
 async function wsCadastro() {
@@ -353,7 +430,34 @@ async function wsCadastro() {
                 let descProduto = rows[i].getAttribute('pro_descProduto');
                 let custoProduto = rows[i].getAttribute('pro_vCompra');
                 let estoqueProduto = 0;
+
+                let nameCategoria = rows[i].getAttribute('pro_descCategoria');
+                let idCategoria = "";
+                let nameSubCategoria = rows[i].getAttribute('pro_descSubCategoria');
+
+                if(nameSubCategoria.toLowerCase() == "sem subcategoria"){
+                  if(nameCategoria != "Sem Categoria"){
+                    await setCategoria(nameCategoria)
+                    .then(response => {
+                      idCategoria = response;
+                    })
+                  }
+                }
+                else{
+                  await setSubCategoria(nameCategoria, nameSubCategoria)
+                  .then(response => {
+                    idCategoria = response;
+                  })
+                }
   
+
+                if(nameCategoria != "Sem Categoria"){
+                  await setCategoria(nameCategoria)
+                  .then(response => {
+                    idCategoria = response;
+                  })
+                }
+
                 const dados = JSON.parse(fs.readFileSync('./src/build/produtos.json', 'utf8'));
                 if (dados.produtos[idProduto]) {
                   if (exclusaoProduto == "1") {
@@ -388,7 +492,7 @@ async function wsCadastro() {
                         }
                       })
                       .then(async() =>{
-                        await atualizarProduto(descProduto, null, estoqueProduto, custoProduto, null, idTray);
+                        await atualizarProduto(descProduto, null, estoqueProduto, custoProduto, idCategoria, null, idTray);
                       })
                     }
                     else{
@@ -414,7 +518,7 @@ async function wsCadastro() {
                         }
                       })
                       .then(async () => {
-                        await cadastrarProduto(descProduto, estoqueProduto, custoProduto)
+                        await cadastrarProduto(descProduto, estoqueProduto, custoProduto, idCategoria)
                           .then(id => {
                             dados.produtos[idProduto] = id;
                             produtosCadastrados++;
@@ -462,7 +566,7 @@ async function atualizarEstoque() {
                 })
                 .then(async () => {
                   let id = parseInt(idTray);
-                  await atualizarProduto(null, null, estoqueProduto, null, null, id);
+                  await atualizarProduto(null, null, estoqueProduto, null, null, null, id);
                   gravarLog(`Atualizado estoque do produto de idTray: ${idTray}`);
                 })
                 .catch((_) => { console.log(_) })
@@ -610,7 +714,7 @@ async function uploadPreco() {
           let valorFixado = precoNumber.toFixed(2);
   
           if (dados.produtos[idSaurus] && tabPreco=="1") {
-            atualizarProduto(null, valorFixado, null, null, null, idTray)
+            atualizarProduto(null, valorFixado, null, null, null, null, idTray)
               .then(() => {
                 gravarLog(`Preco ${valorFixado} Cadastrado no id ${idTray} com sucesso`);
               })
@@ -690,7 +794,7 @@ async function uploadCodigos() {
           let codigo = codigoLeitura.getAttribute('pro_codProduto');
   
           if (dados.produtos[idSaurus]) {
-            atualizarProduto(null, null, null, null, codigo, idTray)
+            atualizarProduto(null, null, null, null, null, codigo, idTray)
               .then(() => {
                 gravarLog(`Codigo ${codigo} Cadastrado no id ${idTray} com sucesso`);
               })
@@ -765,13 +869,15 @@ async function sincronizacaoContinua(data) {
 
 
 function gravarLog(mensagem) {
+  if (!fs.existsSync('../logs')) {
+    fs.mkdirSync('../logs');
+  }
   const data = new Date();
   data.setHours(data.getHours() - 3);
   const dataFormatada = `${data.getFullYear()}-${data.getMonth() + 1}-${data.getDate()}`;
   const logMessage = `[${data.toISOString()}]: ${mensagem}\n`;
   const logFileName = `../../../logs/log_${dataFormatada}.txt`;
   const logFilePath = path.join(__dirname, logFileName);
-
   fs.appendFile(logFilePath, logMessage, (err) => {
     if (err) {
       console.error('Erro ao gravar o log:', err);
@@ -782,6 +888,14 @@ function gravarLog(mensagem) {
 }
 
 function gravarLogErro(mensagem) {
+  if (!fs.existsSync('../logs')) {
+    fs.mkdirSync('../logs');
+  }
+  
+  if (!fs.existsSync('../logs/logsErr')) {
+    fs.mkdirSync('../logs/logsErr');
+  }
+
   const data = new Date();
   data.setHours(data.getHours() - 3);
   const dataFormatada = `${data.getFullYear()}-${data.getMonth() + 1}-${data.getDate()}`;
@@ -803,7 +917,6 @@ module.exports = {
   setSenha,
   sincronizacaoUnica,
   sincronizacaoContinua,
-  atualizarEstoque
+  atualizarEstoque,
+  setCategoria
 };
-
-
