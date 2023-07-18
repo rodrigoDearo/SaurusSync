@@ -331,12 +331,15 @@ async function setCategoria(name){
       const dados = JSON.parse(fs.readFileSync('./src/build/categoria.json', 'utf8'));
 
       if(dados.categorias[name]){
-        idCategoria = dados.categorias[name];
+        idCategoria = dados.categorias[name].id;
       }
       else{
         await criarCategoria(name)
         .then(response => {
-          dados.categorias[name] = response;
+          dados.categorias[name] = {
+            id: response,
+            subcategorias: {}
+          };
           fs.writeFileSync('./src/build/categoria.json', JSON.stringify(dados));
           gravarLog(`Criado categoria ${name} -> ${response}`);
           resolve(response);
@@ -352,41 +355,51 @@ async function setCategoria(name){
 }
 
 
-async function setSubCategoria(categoria, subCategoria){
-  let idSubcategoria;
+async function setSubCategoria(categoria, subCategoria) {
   return new Promise(async (resolve, reject) => {
     try {
       const dados = JSON.parse(fs.readFileSync('./src/build/categoria.json', 'utf8'));
-      if(dados.subcategorias[subCategoria]){
-        idSubcategoria = dados.subcategorias[subCategoria]
-      }
-      else{
-        let idCategoria;
-        if(!dados.categorias[categoria]){
-          await setCategoria(categoria)
-          .then(response => {
-            idCategoria = response;
-          })
-        }
-        else{
-          idCategoria = dados.categorias[categoria];
-        }
+      let idCategoria, idSubcategoria;
 
-        await criarSubCategoria(subCategoria, idCategoria)
-        .then(response => {
-          dados.subcategorias[subCategoria] = response;
-          gravarLog(`Criado SubCategoria ${subCategoria} -> ${response} através da Categoria pai ${categoria} -> ${idCategoria}`);
+      if (!dados.categorias[categoria]) {
+        try {
+          idCategoria = await setCategoria(categoria)
+        } catch (error) {
+          reject(error);
+          return;
+        }
+      } else {
+        idCategoria = dados.categorias[categoria].id;
+      }
+
+      const dadosNovos = JSON.parse(fs.readFileSync('./src/build/categoria.json', 'utf8'));
+
+      if(dadosNovos.categorias[categoria] == undefined){
+        gravarLogErro(`Indefinido esta no 1 ${idCategoria}`);
+      }
+      else if (dadosNovos.categorias[categoria].subcategorias[subCategoria]) {
+        idSubcategoria = dadosNovos.categorias[categoria].subcategorias[subCategoria];
+        resolve(idSubcategoria);
+      } else {
+        try {
+          const response = await criarSubCategoria(subCategoria, idCategoria);
+          dadosNovos.categorias[categoria].subcategorias[subCategoria] = response;
+          if(dadosNovos.categorias[categoria] == undefined){
+            gravarLogErro('Indefinido esta no 2');
+          }
+          fs.writeFileSync('./src/build/categoria.json', JSON.stringify(dados));
+          fs.writeFileSync('./src/build/categoria.json', JSON.stringify(dadosNovos));
           resolve(response);
-        })
+        } catch (error) {
+          reject(error);
+        }
       }
-
-      fs.writeFileSync('./src/build/categoria.json', JSON.stringify(dados));
-      resolve(idSubcategoria)
     } catch (error) {
-      reject(error)
+      reject(error);
     }
-  })
+  });
 }
+
 
 
 async function wsCadastro() {
@@ -422,7 +435,7 @@ async function wsCadastro() {
                 let idCategoria = "";
                 let nameSubCategoria = rows[i].getAttribute('pro_descSubCategoria');
 
-                if(nameSubCategoria == "Sem Subcategoria"){
+                if(nameSubCategoria.toLowerCase() == "sem subcategoria"){
                   if(nameCategoria != "Sem Categoria"){
                     await setCategoria(nameCategoria)
                     .then(response => {
@@ -437,6 +450,14 @@ async function wsCadastro() {
                   })
                 }
   
+
+                if(nameCategoria != "Sem Categoria"){
+                  await setCategoria(nameCategoria)
+                  .then(response => {
+                    idCategoria = response;
+                  })
+                }
+
                 const dados = JSON.parse(fs.readFileSync('./src/build/produtos.json', 'utf8'));
                 if (dados.produtos[idProduto]) {
                   if (exclusaoProduto == "1") {
