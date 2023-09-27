@@ -51,8 +51,8 @@ function leituraDosDados() {
         let dados = JSON.parse(data);
   
         try {
-          consumerKey = "9f52214d3ff8cf0629d1fcfa3bd6a5b5e4fbc21a62305a7d6b450dc64a90cf68";
-          consumerSecret = "68e7ba3319a5b96eece177867a3c6212e7ec930c0ac89b719e1adcaaa6bc380f";
+          consumerKey = "";
+          consumerSecret = "";
           code = dados.dadosApp.tray.code;
           url = dados.dadosApp.tray.url;
           tokenRefresh = dados.dadosApp.tray.refresh_token;
