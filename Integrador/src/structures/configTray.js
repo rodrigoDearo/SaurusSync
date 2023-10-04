@@ -51,8 +51,8 @@ function leituraDosDados() {
         let dados = JSON.parse(data);
   
         try {
-          consumerKey = "";
-          consumerSecret = "";
+          consumerKey = "9f52214d3ff8cf0629d1fcfa3bd6a5b5e4fbc21a62305a7d6b450dc64a90cf68";
+          consumerSecret = "68e7ba3319a5b96eece177867a3c6212e7ec930c0ac89b719e1adcaaa6bc380f";
           code = dados.dadosApp.tray.code;
           url = dados.dadosApp.tray.url;
           tokenRefresh = dados.dadosApp.tray.refresh_token;
@@ -223,6 +223,27 @@ async function cadastrarProduto(thisnome, thisestoque, thisprecoCompra, thiscate
 }
 
 
+/**
+ * *ESTA FUNÇÃO TEM COMO PROPÓSITO RETORNAR A CHAVE QUE TEM COMO VALOR O PARÂMETRO RECEBIDO, USADA PARA ENCONTRAR ID_SAURUS ATRAVÉS DO ID_TRAY
+ * @param {string} arquivoJSON
+ * @param {string} value 
+ * @returns {} 
+ */
+async function retornarChaveJSONatravesDeValue(arquivoJSON, valorDaChave){
+  return new Promise(async (resolve, reject) => {
+    try {
+      for (const idDaChave in arquivoJSON) {
+        if (arquivoJSON.hasOwnProperty(idDaChave)) {
+          if (arquivoJSON[idDaChave].trim() === valorDaChave.trim()) {
+            resolve(idDaChave);
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  })
+}
 
 
 async function atualizarProduto(thisnome, thispreco, thisestoque, thisprecoCompra, thiscategoria, thisCodigo, thisid) {
@@ -235,11 +256,22 @@ async function atualizarProduto(thisnome, thispreco, thisestoque, thisprecoCompr
       .then(() => definirProdutoAtualizado(thisnome, thispreco, thisestoque, thisprecoCompra, thiscategoria, thisCodigo))
       .then(produtoAtualizado => {
         axios.put(`${url}/products/${id}?access_token=${acessToken}`, produtoAtualizado)
-          .then(response => {
-          })
-          .catch(error => {
+        .catch(async (error)=> {
+
+          if(error.response.data.causes[0]=='Invalid parameter id.'){  //* VERIFICA SE O ERRO ESTÁ RELACIONADO COM UM ID NÃO ENCONTRADO NA BASE
+            const produtosSincronizadosJSON = JSON.parse(fs.readFileSync('./src/build/produtos.json', 'utf8'));
+            await retornarChaveJSONatravesDeValue(produtosSincronizadosJSON.produtos, id)
+            .then(idSaurus => {
+              delete produtosSincronizadosJSON.produtos[idSaurus]
+              console.log(`O PRODUTO DE ID_SAURUS: ${idSaurus} NÃO FOI ENCONTRADO NA BASE TRAY PELO ID REFERENCIADO (${id}), PORTANTO FOI DELETADO DA BASE DOS PRODUTOS SINCRONIZADOS PARA RE-CADASTRO`)
+              fs.writeFileSync('./src/build/produtos.json', JSON.stringify(produtosSincronizadosJSON));
+            })
+          }
+          else{
             console.log(error);
-          });
+          }
+        });
+
       });
   } catch (error) {
     console.error(error);

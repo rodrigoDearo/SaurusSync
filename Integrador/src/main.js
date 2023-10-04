@@ -14,8 +14,13 @@ expss.get('/sincronizacaoUnica/:data', async (req, res) => {
   console.log('Sincronização Única Realizada');
 
   await sincronizacaoUnica(req.params.data)
-  .then((response) => {
+  .then(async (response) => {
     res.status(200).send(response);
+    //! VERIFICAR POSSIBILIDADE DE CADASTRAR OS PRODUTOS DELETADOS DA BASE DO INTEGRADOR SEM TER QUE RODAR NOVAMENTE A SINCRONIZAÇÃO
+    await sincronizacaoUnica(req.params.data)
+    .then((response) => {
+      res.status(200).send(response);
+    })
   })
   .catch((error) => {
     res.status(500).send(error);
